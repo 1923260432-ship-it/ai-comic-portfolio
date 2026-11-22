@@ -104,6 +104,7 @@
 .screen-swipe{display:none}
 @media(max-width:650px){.frame-track{left:21%;right:-21%;gap:4%;padding-inline:0}.film-frame{flex-basis:58%;height:78%}}
 @media(prefers-reduced-motion:reduce){.film-frame{transition:none}}
+.film-strip.is-hovering{scroll-snap-type:none}
 </style>
 </head>
 <body>
@@ -498,9 +499,42 @@ function sweepText(event) {
   setTimeout(() => target.classList.remove('text-sweep'), 790);
 }
 resumeBody.addEventListener('click', sweepText);
+let hoverTarget;
+let hoverFrame;
+function driftFilmStrip() {
+  hoverFrame = undefined;
+  if (hoverTarget === undefined) return;
+  const distance = hoverTarget - filmStrip.scrollLeft;
+  if (Math.abs(distance) > 1) {
+    filmStrip.scrollLeft += Math.sign(distance) * Math.max(1, Math.abs(distance) * 0.09);
+    hoverFrame = requestAnimationFrame(driftFilmStrip);
+  }
+}
+function stopHoverDrift() {
+  hoverTarget = undefined;
+  cancelAnimationFrame(hoverFrame);
+  hoverFrame = undefined;
+  if (!filmStrip.classList.contains('is-hovering')) return;
+  const index = nearestFilm();
+  filmStrip.classList.remove('is-hovering');
+  wheelTarget = index;
+  centerFilm(index);
+}
+projection.addEventListener('pointermove', event => {
+  if (event.pointerType !== 'mouse' || event.buttons || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const rect = projection.getBoundingClientRect();
+  const fraction = (event.clientX - rect.left) / rect.width;
+  hoverTarget = Math.max(0, Math.min(1, (fraction - 0.08) / 0.84)) * (filmStrip.scrollWidth - filmStrip.clientWidth);
+  filmStrip.classList.add('is-hovering');
+  if (hoverFrame === undefined) hoverFrame = requestAnimationFrame(driftFilmStrip);
+});
+projection.addEventListener('pointerleave', stopHoverDrift);
+projection.addEventListener('pointerdown', stopHoverDrift, true);
+projection.addEventListener('wheel', stopHoverDrift, {passive:true});
 </script>
 </body>
 </html>
+
 
 
 
