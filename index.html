@@ -484,19 +484,15 @@ const interactiveText = '.name-en, .hero h1, main p, .section h2, .section h3, .
 function sweepText(event) {
   if (document.body.classList.contains('editing')) return;
   const target = event.target.closest(interactiveText);
-  if (!target || (event.type === 'pointerover' && (event.pointerType !== 'mouse' || target.contains(event.relatedTarget)))) return;
-  target.classList.remove('text-sweep');
-  void target.offsetWidth;
+  if (!target || target.classList.contains('text-sweep')) return;
   target.classList.add('text-sweep');
-  clearTimeout(target.sweepTimer);
-  target.sweepTimer = setTimeout(() => target.classList.remove('text-sweep'), 790);
+  setTimeout(() => target.classList.remove('text-sweep'), 790);
 }
 resumeBody.addEventListener('click', sweepText);
-resumeBody.addEventListener('pointerover', sweepText);
-resumeBody.addEventListener('focusin', sweepText);
 </script>
 </body>
 </html>
+
 
 
 
