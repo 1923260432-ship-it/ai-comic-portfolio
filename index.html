@@ -80,7 +80,7 @@
 <body>
 <div class="edit-bar" id="edit-bar" hidden><strong>直接点击文字修改，改完点保存</strong><button id="save-edits" type="button">保存</button><button id="cancel-edits" type="button">取消</button><label for="edit-film-slot">影片位</label><select id="edit-film-slot"><option value="0">第 1 支</option><option value="1">第 2 支</option><option value="2">第 3 支</option><option value="3">第 4 支</option><option value="4">第 5 支</option></select><label for="edit-film-title">片名</label><input id="edit-film-title" type="text" maxlength="100" placeholder="输入片名"><button type="button" id="upload-film">添加或更换视频</button><a href="#projection">回到视频</a><span id="edit-message" role="status"></span></div>
 <section class="cinema" aria-label="作品放映">
-  <div class="cinema-head"><strong>AI 漫剧制作师</strong><div class="cinema-tools"><details class="index-menu"><summary>索引</summary><div class="index-panel"><a href="#projection">作品放映</a><a href="#projects">项目经历</a><a href="#home">个人简历</a><a href="#contact">联系方式</a></div></details></div></div>
+  <div class="cinema-head"><strong>AI 漫剧制作师</strong><div class="cinema-tools"><details class="index-menu"><summary>索引</summary><div class="index-panel"><a href="#projection">作品放映</a><a href="#home">个人简历</a><a href="#contact">联系方式</a></div></details></div></div>
   <div class="projection" id="projection"><div class="screen-swipe" aria-hidden="true"></div>
     <div class="empty" id="projection-empty"><p>视频加载后将在这里播放。</p></div>
     <video id="showreel" hidden controls muted playsinline loop preload="metadata" aria-label="作品视频"></video>
@@ -92,17 +92,14 @@
   <button type="button" tabindex="-1" data-film="3" aria-pressed="false">04 · 待添加</button>
   <button type="button" tabindex="-1" data-film="4" aria-pressed="false">05 · 待添加</button>
 </nav>
-<div class="cinema-foot"><input id="video-file" type="file" accept="video/*,.mp4,.webm" hidden><p id="video-status" role="status">软柿子</p><a href="#projects">项目经历</a></div>
+<div class="cinema-foot"><input id="video-file" type="file" accept="video/*,.mp4,.webm" hidden><p id="video-status" role="status">软柿子</p></div>
 </section>
-<header class="top"><div class="wrap bar"><a href="#home"><strong>姜澜</strong></a><nav aria-label="简历导航"><a href="#projects">项目</a><a href="#skills">技能</a><a href="#contact">联系</a></nav></div></header>
+<header class="top"><div class="wrap bar"><a href="#home"><strong>姜澜</strong></a><nav aria-label="简历导航"><a href="#skills">技能</a><a href="#contact">联系</a></nav></div></header>
 <main class="wrap" id="home">
 <section class="hero" aria-labelledby="role">
 <p class="name">姜澜</p><h1 id="role">AI 漫剧制作师</h1>
-<div class="hero-bottom"><p>来自杭州，毕业于浙江万里学院会展经济与管理专业。有场馆运营、活动执行、新媒体内容与跨境电商运营经历。</p><a class="action" href="#projects">查看项目经历</a></div>
+<div class="hero-bottom"><p>来自杭州，毕业于浙江万里学院会展经济与管理专业。有场馆运营、活动执行、新媒体内容与跨境电商运营经历。</p></div>
 </section>
-<section class="section" id="projects"><h2>项目经历</h2><div class="entries">
-<article><h3>富阳文旅项目</h3><p>为富阳文旅赛道制作抖音视频。</p></article>
-</div></section>
 <section class="section" id="skills"><h2>技能与证书</h2><div class="entries">
 <p>通过大学英语四六级，雅思 6.0。可用英语进行日常交流，快速阅读英文文档和书籍。</p>
 <p>通过全国计算机二级考试，熟练使用 Office 等办公软件。持 C2 驾照。</p>
@@ -377,7 +374,7 @@ cancel.addEventListener('click', () => {
 });
 save.addEventListener('click', async () => {
   save.disabled = cancel.disabled = upload.disabled = slot.disabled = titleInput.disabled = true;
-  const draft = {resumeRevision: 2, text: fields.map(field => field.textContent), videos: filmButtons.map((_, index) => filmAt(index)), titles: filmButtons.map((_, index) => customTitle(index).trim())};
+  const draft = {resumeRevision: 3, text: fields.map(field => field.textContent), videos: filmButtons.map((_, index) => filmAt(index)), titles: filmButtons.map((_, index) => customTitle(index).trim())};
   try {
     const db = await database;
     await new Promise((resolve, reject) => {
@@ -414,7 +411,10 @@ database.then(db => {
   request.onsuccess = () => {
     if (request.result) {
       saved = request.result;
-      if (saved.resumeRevision === 2) applyText(saved.text);
+      if (saved.resumeRevision === 2 && Array.isArray(saved.text)) {
+        saved = {...saved, resumeRevision: 3, text: [...saved.text.slice(0, 3), ...saved.text.slice(6)]};
+      }
+      if (saved.resumeRevision === 3) applyText(saved.text);
       selectFilm(activeFilm);
     }
     editButtons.forEach(button => button.disabled = false);
@@ -424,6 +424,7 @@ database.then(db => {
 </script>
 </body>
 </html>
+
 
 
 
