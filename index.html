@@ -84,7 +84,7 @@
 @media(prefers-reduced-motion:no-preference){
 .text-sweep{animation:word-reveal .5s steps(var(--reveal-steps,16),end) both,word-sweep .76s ease-out both}
 .name-en{--reveal-steps:9}
-@keyframes word-reveal{from{clip-path:inset(-.14em 100% -.14em 0)}to{clip-path:inset(-.14em -.08em -.14em -.08em)}}
+.text-sweep{mask-image:linear-gradient(90deg,#000 50%,transparent 50%);mask-size:200% 100%;mask-repeat:no-repeat}@keyframes word-reveal{from{mask-position:100% 0}to{mask-position:0 0}}
 }
 /* Moving film frames */
 .projection{display:block;overflow:hidden;background:#121210;border:0}
@@ -492,6 +492,7 @@ resumeBody.addEventListener('click', sweepText);
 </script>
 </body>
 </html>
+
 
 
 
