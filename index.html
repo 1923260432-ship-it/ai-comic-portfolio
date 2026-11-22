@@ -86,6 +86,16 @@
 .name-en{--reveal-steps:9}
 @keyframes word-reveal{from{clip-path:inset(-.14em 100% -.14em 0)}to{clip-path:inset(-.14em -.08em -.14em -.08em)}}
 }
+/* Moving film frames */
+.projection{display:block;overflow:hidden;background:#121210;border:0}
+.frame-track{position:absolute;inset:0;display:flex;align-items:stretch;gap:3%;padding-inline:11%;transform:translateX(var(--frame-offset,0%));will-change:transform}
+.film-frame{flex:0 0 100%;position:relative;display:grid;place-items:center;min-width:0;overflow:hidden;background:#080808;border:1px solid #39362e}
+.film-frame video{position:absolute;inset:0}
+.frame-label{padding:12px;text-align:center;color:var(--muted);font-size:clamp(.95rem,2vw,1.25rem)}
+.film-frame:has(video:not([hidden])) .frame-label,.film-frame:has(.empty:not([hidden])) .frame-label{visibility:hidden}
+.film-frame .empty{position:relative}
+.screen-swipe{z-index:2;inset:0 0 52px}
+@media(max-width:650px){.frame-track{padding-inline:5%;gap:2%}}
 </style>
 </head>
 <body>
@@ -186,6 +196,7 @@ function filmTitle(index) {
 function refreshFilmTitles() {
   filmButtons.forEach((button, index) => {
     button.textContent = String(index + 1).padStart(2, '0') + ' · ' + filmTitle(index);
+    frames[index].firstElementChild.textContent = filmTitle(index);
   });
   status.textContent = filmTitle(activeFilm);
 }
@@ -201,6 +212,7 @@ titleInput.addEventListener('input', () => {
 });
 function selectFilm(index) {
   activeFilm = index;
+  if (video.parentElement !== frames[index]) frames[index].append(video, placeholder);
   filmButtons.forEach((button, position) => {
     button.setAttribute('aria-pressed', position === index);
   });
@@ -221,6 +233,29 @@ function selectFilm(index) {
 
 }
 const filmStrip = document.querySelector('.film-strip');
+const projection = document.querySelector('.projection');
+const frameTrack = document.createElement('div');
+frameTrack.className = 'frame-track';
+projection.prepend(frameTrack);
+const frames = filmButtons.map(() => {
+  const frame = document.createElement('div');
+  frame.className = 'film-frame';
+  const label = document.createElement('span');
+  label.className = 'frame-label';
+  frame.append(label);
+  frameTrack.append(frame);
+  return frame;
+});
+function renderFramePosition() {
+  const first = filmButtons[0].getBoundingClientRect();
+  const second = filmButtons[1].getBoundingClientRect();
+  const strip = filmStrip.getBoundingClientRect();
+  const spacing = second.left + second.width / 2 - first.left - first.width / 2;
+  const center = strip.left + filmStrip.clientWidth / 2;
+  const position = spacing ? Math.max(0, Math.min(frames.length - 1, (center - first.left - first.width / 2) / spacing)) : 0;
+  const step = frames[1].offsetLeft - frames[0].offsetLeft;
+  frameTrack.style.setProperty('--frame-offset', (-position * step) + 'px');
+}
 let settleTimer;
 let drag;
 let wheelTarget = 0;
@@ -245,8 +280,9 @@ function centerFilm(index) {
 }
 
 filmStrip.addEventListener('scroll', () => {
+  renderFramePosition();
   clearTimeout(settleTimer);
-  if (drag) return;
+  if (drag || screenDrag) return;
   settleTimer = setTimeout(() => {
     const index = nearestFilm();
     wheelTarget = index;
@@ -258,18 +294,27 @@ const screenSwipe = document.querySelector('.screen-swipe');
 let screenDrag;
 screenSwipe.addEventListener('pointerdown', event => {
   if (!event.isPrimary || event.button !== 0) return;
-  screenDrag = {id:event.pointerId, x:event.clientX};
+  screenDrag = {id:event.pointerId, x:event.clientX, left:filmStrip.scrollLeft};
   screenSwipe.setPointerCapture(event.pointerId);
   screenSwipe.classList.add('is-dragging');
+  filmStrip.classList.add('is-dragging');
+});
+screenSwipe.addEventListener('pointermove', event => {
+  if (screenDrag?.id !== event.pointerId) return;
+  const frameStep = frames[1].offsetLeft - frames[0].offsetLeft;
+  const width = filmButtons[1].offsetLeft - filmButtons[0].offsetLeft;
+  if (frameStep) filmStrip.scrollLeft = screenDrag.left + (screenDrag.x - event.clientX) * width / frameStep;
 });
 function endScreenDrag(event) {
   if (screenDrag?.id !== event.pointerId) return;
   const distance = screenDrag.x - event.clientX;
   screenDrag = undefined;
   screenSwipe.classList.remove('is-dragging');
-  if (event.type !== 'pointerup' || Math.abs(distance) < 44) return;
-  wheelTarget = Math.max(0, Math.min(filmButtons.length - 1, wheelTarget + Math.sign(distance)));
+  const nearest = nearestFilm();
+  filmStrip.classList.remove('is-dragging');
+  wheelTarget = nearest === activeFilm && Math.abs(distance) > 44 ? Math.max(0, Math.min(filmButtons.length - 1, activeFilm + Math.sign(distance))) : nearest;
   centerFilm(wheelTarget);
+
 }
 screenSwipe.addEventListener('pointerup', endScreenDrag);
 screenSwipe.addEventListener('pointercancel', endScreenDrag);
@@ -416,6 +461,8 @@ video.addEventListener('error', () => {
 
 editButtons.forEach(button => button.disabled = true);
 selectFilm(0);
+renderFramePosition();
+window.addEventListener('resize', renderFramePosition);
 const database = openDatabase();
 database.then(db => {
   const request = db.transaction('draft').objectStore('draft').get('resume');
@@ -450,6 +497,7 @@ resumeBody.addEventListener('focusin', sweepText);
 </script>
 </body>
 </html>
+
 
 
 
