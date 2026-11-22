@@ -75,6 +75,12 @@
 .screen-swipe{z-index:1;inset:0 0 54px}
 .film-strip{position:relative;inset:auto;grid-row:4;min-width:0;--film-width:clamp(145px,23vw,260px)}
 @media(max-width:650px){.cinema-head{padding-block:8px}.cinema{gap:7px}.projection{height:max(240px,calc(100svh - 215px))}.cinema-foot p{max-width:70%}}
+.name-en{display:table;margin:0 0 8px;font-size:clamp(2rem,6vw,5rem);font-weight:700;line-height:1.05;letter-spacing:-.055em;color:var(--ink)}
+.name-en:focus-visible{outline:1px solid var(--accent);outline-offset:6px}
+.text-sweep{--sweep-base:var(--ink);background-image:linear-gradient(100deg,var(--sweep-base) 36%,var(--accent) 47%,#fff 50%,var(--accent) 53%,var(--sweep-base) 64%);background-size:300% 100%;background-clip:text;-webkit-background-clip:text;color:transparent!important;animation:word-sweep .76s ease-out both}
+.text-sweep:is(.name,.muted,dt,.section h2){--sweep-base:var(--muted)}
+@keyframes word-sweep{from{background-position:100% 0}to{background-position:0 0}}
+@media(prefers-reduced-motion:reduce){.text-sweep{background:none;color:var(--accent)!important;animation:none}}
 </style>
 </head>
 <body>
@@ -97,7 +103,7 @@
 <header class="top"><div class="wrap bar"><a href="#home"><strong>姜澜</strong></a><nav aria-label="简历导航"><a href="#skills">技能</a><a href="#contact">联系</a></nav></div></header>
 <main class="wrap" id="home">
 <section class="hero" aria-labelledby="role">
-<p class="name">姜澜</p><h1 id="role">AI 漫剧制作师</h1>
+<span class="name-en" tabindex="0">JIANG LAN</span><p class="name">姜澜</p><h1 id="role">AI 漫剧制作师</h1>
 <div class="hero-bottom"><p>来自杭州，毕业于浙江万里学院会展经济与管理专业。有场馆运营、活动执行、新媒体内容与跨境电商运营经历。</p></div>
 </section>
 <section class="section" id="skills"><h2>技能与证书</h2><div class="entries">
@@ -421,9 +427,25 @@ database.then(db => {
   };
   request.onerror = () => editButtons.forEach(button => button.disabled = false);
 }).catch(() => editButtons.forEach(button => button.disabled = false));
+const resumeBody = document.querySelector('main');
+const interactiveText = '.name-en, .hero h1, main p, .section h2, .section h3, .section li, .work-details dt, .work-details dd';
+function sweepText(event) {
+  if (document.body.classList.contains('editing')) return;
+  const target = event.target.closest(interactiveText);
+  if (!target || (event.type === 'pointerover' && (event.pointerType !== 'mouse' || target.contains(event.relatedTarget)))) return;
+  target.classList.remove('text-sweep');
+  void target.offsetWidth;
+  target.classList.add('text-sweep');
+  clearTimeout(target.sweepTimer);
+  target.sweepTimer = setTimeout(() => target.classList.remove('text-sweep'), 790);
+}
+resumeBody.addEventListener('click', sweepText);
+resumeBody.addEventListener('pointerover', sweepText);
+resumeBody.addEventListener('focusin', sweepText);
 </script>
 </body>
 </html>
+
 
 
 
