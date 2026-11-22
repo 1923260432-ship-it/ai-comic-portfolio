@@ -81,6 +81,11 @@
 .text-sweep:is(.name,.muted,dt,.section h2){--sweep-base:var(--muted)}
 @keyframes word-sweep{from{background-position:100% 0}to{background-position:0 0}}
 @media(prefers-reduced-motion:reduce){.text-sweep{background:none;color:var(--accent)!important;animation:none}}
+@media(prefers-reduced-motion:no-preference){
+.text-sweep{animation:word-reveal .5s steps(var(--reveal-steps,16),end) both,word-sweep .76s ease-out both}
+.name-en{--reveal-steps:9}
+@keyframes word-reveal{from{clip-path:inset(-.14em 100% -.14em 0)}to{clip-path:inset(-.14em -.08em -.14em -.08em)}}
+}
 </style>
 </head>
 <body>
@@ -445,6 +450,7 @@ resumeBody.addEventListener('focusin', sweepText);
 </script>
 </body>
 </html>
+
 
 
 
