@@ -66,13 +66,22 @@
 @media(prefers-reduced-motion:reduce){.film-strip button{transition:none}}
 .screen-swipe{position:absolute;z-index:0;inset:0 0 56px;touch-action:pan-y;cursor:grab}.screen-swipe.is-dragging{cursor:grabbing}.cinema-head,.cinema-foot{z-index:2;pointer-events:none}.cinema-head :is(button,a,summary){pointer-events:auto}.index-panel{pointer-events:auto}.film-strip{z-index:1}
 [data-work-field]{min-height:1.65em}.editing [data-work-field]:empty::before{content:attr(data-placeholder);color:var(--muted);pointer-events:none}
+/* Keep navigation and the selector outside the video frame. */
+.cinema{display:grid;height:auto;min-height:100svh;grid-template-rows:auto minmax(0,1fr) auto auto;padding:0 clamp(16px,4vw,62px) 14px;gap:10px}
+.cinema-head,.cinema-foot{position:static;padding:0;pointer-events:auto;align-items:center}
+.cinema-head{min-height:52px}.cinema-foot{grid-row:3;min-height:36px}.cinema-foot p{font-size:clamp(1.1rem,2.4vw,1.8rem);text-shadow:none}
+.projection{position:relative;inset:auto;z-index:0;min-height:240px;height:clamp(240px,calc(100svh - 200px),780px)}
+.projection:has(video:not([hidden])):after{content:none}
+.screen-swipe{z-index:1;inset:0 0 54px}
+.film-strip{position:relative;inset:auto;grid-row:4;min-width:0;--film-width:clamp(145px,23vw,260px)}
+@media(max-width:650px){.cinema-head{padding-block:8px}.cinema{gap:7px}.projection{height:max(240px,calc(100svh - 215px))}.cinema-foot p{max-width:70%}}
 </style>
 </head>
 <body>
 <div class="edit-bar" id="edit-bar" hidden><strong>直接点击文字修改，改完点保存</strong><button id="save-edits" type="button">保存</button><button id="cancel-edits" type="button">取消</button><label for="edit-film-slot">影片位</label><select id="edit-film-slot"><option value="0">第 1 支</option><option value="1">第 2 支</option><option value="2">第 3 支</option><option value="3">第 4 支</option><option value="4">第 5 支</option></select><label for="edit-film-title">片名</label><input id="edit-film-title" type="text" maxlength="100" placeholder="输入片名"><button type="button" id="upload-film">添加或更换视频</button><a href="#projection">回到视频</a><span id="edit-message" role="status"></span></div>
 <section class="cinema" aria-label="作品放映">
   <div class="cinema-head"><strong>AI 漫剧制作师</strong><div class="cinema-tools"><details class="index-menu"><summary>索引</summary><div class="index-panel"><a href="#projection">作品放映</a><a href="#projects">项目经历</a><a href="#home">个人简历</a><a href="#contact">联系方式</a></div></details></div></div>
-  <div class="screen-swipe" aria-hidden="true"></div><div class="projection" id="projection">
+  <div class="projection" id="projection"><div class="screen-swipe" aria-hidden="true"></div>
     <div class="empty" id="projection-empty"><p>视频加载后将在这里播放。</p></div>
     <video id="showreel" hidden controls muted playsinline loop preload="metadata" aria-label="作品视频"></video>
   </div>
@@ -415,6 +424,7 @@ database.then(db => {
 </script>
 </body>
 </html>
+
 
 
 
