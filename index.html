@@ -96,6 +96,14 @@
 .film-frame .empty{position:relative}
 .screen-swipe{z-index:2;inset:0 0 52px}
 @media(max-width:650px){.frame-track{padding-inline:5%;gap:2%}}
+/* Compact film gallery */
+.frame-track{padding-inline:0;align-items:center;gap:2%;left:35%;right:-35%}
+.film-frame{flex:0 0 30%;height:78%;max-height:520px;transition:transform .26s ease,border-color .26s ease;touch-action:pan-y}
+@media(hover:hover){.film-frame:hover{transform:scale(1.08);z-index:1;border-color:var(--accent)}}
+.projection{cursor:grab;touch-action:pan-y}.projection.is-dragging{cursor:grabbing}
+.screen-swipe{display:none}
+@media(max-width:650px){.frame-track{left:21%;right:-21%;gap:4%;padding-inline:0}.film-frame{flex-basis:58%;height:78%}}
+@media(prefers-reduced-motion:reduce){.film-frame{transition:none}}
 </style>
 </head>
 <body>
@@ -290,10 +298,11 @@ filmStrip.addEventListener('scroll', () => {
   }, 120);
 }, {passive:true});
 
-const screenSwipe = document.querySelector('.screen-swipe');
+const screenSwipe = projection;
 let screenDrag;
 screenSwipe.addEventListener('pointerdown', event => {
   if (!event.isPrimary || event.button !== 0) return;
+  if (event.target === video && event.clientY >= video.getBoundingClientRect().bottom - 54) return;
   screenDrag = {id:event.pointerId, x:event.clientX, left:filmStrip.scrollLeft};
   screenSwipe.setPointerCapture(event.pointerId);
   screenSwipe.classList.add('is-dragging');
@@ -492,6 +501,7 @@ resumeBody.addEventListener('click', sweepText);
 </script>
 </body>
 </html>
+
 
 
 
