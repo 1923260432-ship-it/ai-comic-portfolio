@@ -105,22 +105,28 @@
 @media(max-width:650px){.frame-track{left:21%;right:-21%;gap:4%;padding-inline:0}.film-frame{flex-basis:58%;height:78%}}
 @media(prefers-reduced-motion:reduce){.film-frame{transition:none}}
 .film-strip.is-hovering{scroll-snap-type:none}
+/* Eight unlabelled gallery frames */
+body:not(.editing) .film-strip{position:absolute;inset:auto clamp(16px,4vw,62px) 0;opacity:0;pointer-events:none}
+body:not(.editing) .frame-label,body:not(.editing) #projection-empty,body:not(.editing) .cinema-foot{visibility:hidden}
+body:not(.editing) .cinema-foot{display:none}
+body:not(.editing) .cinema{grid-template-rows:auto minmax(0,1fr)}
+body:not(.editing) .projection{height:clamp(240px,calc(100svh - 90px),840px)}
 </style>
 </head>
 <body>
-<div class="edit-bar" id="edit-bar" hidden><strong>直接点击文字修改，改完点保存</strong><button id="save-edits" type="button">保存</button><button id="cancel-edits" type="button">取消</button><label for="edit-film-slot">影片位</label><select id="edit-film-slot"><option value="0">第 1 支</option><option value="1">第 2 支</option><option value="2">第 3 支</option><option value="3">第 4 支</option><option value="4">第 5 支</option></select><label for="edit-film-title">片名</label><input id="edit-film-title" type="text" maxlength="100" placeholder="输入片名"><button type="button" id="upload-film">添加或更换视频</button><a href="#projection">回到视频</a><span id="edit-message" role="status"></span></div>
+<div class="edit-bar" id="edit-bar" hidden><strong>直接点击文字修改，改完点保存</strong><button id="save-edits" type="button">保存</button><button id="cancel-edits" type="button">取消</button><label for="edit-film-slot">影片位</label><select id="edit-film-slot"><option value="0">第 1 支</option><option value="1">第 2 支</option><option value="2">第 3 支</option><option value="3">第 4 支</option><option value="4">第 5 支</option><option value="5">第 6 支</option><option value="6">第 7 支</option><option value="7">第 8 支</option></select><label for="edit-film-title">片名</label><input id="edit-film-title" type="text" maxlength="100" placeholder="输入片名"><button type="button" id="upload-film">添加或更换视频</button><a href="#projection">回到视频</a><span id="edit-message" role="status"></span></div>
 <section class="cinema" aria-label="作品放映">
   <div class="cinema-head"><strong>AI 漫剧制作师</strong><div class="cinema-tools"><details class="index-menu"><summary>索引</summary><div class="index-panel"><a href="#projection">作品放映</a><a href="#home">个人简历</a><a href="#contact">联系方式</a></div></details></div></div>
-  <div class="projection" id="projection"><div class="screen-swipe" aria-hidden="true"></div>
+  <div class="projection" id="projection" tabindex="0" aria-label="影片画廊，使用左右方向键切换"><div class="screen-swipe" aria-hidden="true"></div>
     <div class="empty" id="projection-empty"><p>视频加载后将在这里播放。</p></div>
     <video id="showreel" hidden controls muted playsinline loop preload="metadata" aria-label="作品视频"></video>
   </div>
-  <nav class="film-strip" tabindex="0" aria-label="滑动选择影片，也可用左右方向键">
+  <nav class="film-strip" tabindex="-1" aria-label="滑动选择影片，也可用左右方向键">
   <button type="button" tabindex="-1" data-film="0" aria-pressed="true">01 · 软柿子</button>
   <button type="button" tabindex="-1" data-film="1" aria-pressed="false">02 · 待添加</button>
   <button type="button" tabindex="-1" data-film="2" aria-pressed="false">03 · 待添加</button>
   <button type="button" tabindex="-1" data-film="3" aria-pressed="false">04 · 待添加</button>
-  <button type="button" tabindex="-1" data-film="4" aria-pressed="false">05 · 待添加</button>
+  <button type="button" tabindex="-1" data-film="4" aria-pressed="false">05 · 待添加</button><button type="button" tabindex="-1" data-film="5" aria-pressed="false">06 · 待添加</button><button type="button" tabindex="-1" data-film="6" aria-pressed="false">07 · 待添加</button><button type="button" tabindex="-1" data-film="7" aria-pressed="false">08 · 待添加</button>
 </nav>
 <div class="cinema-foot"><input id="video-file" type="file" accept="video/*,.mp4,.webm" hidden><p id="video-status" role="status">软柿子</p></div>
 </section>
@@ -365,7 +371,7 @@ function finishDrag(event) {
 }
 filmStrip.addEventListener('pointerup', finishDrag);
 filmStrip.addEventListener('lostpointercapture', finishDrag);
-filmStrip.addEventListener('keydown', event => {
+projection.addEventListener('keydown', event => {
   if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
   event.preventDefault();
   wheelTarget = Math.max(0, Math.min(filmButtons.length - 1, wheelTarget + (event.key === 'ArrowRight' ? 1 : -1)));
@@ -534,6 +540,7 @@ projection.addEventListener('wheel', stopHoverDrift, {passive:true});
 </script>
 </body>
 </html>
+
 
 
 
