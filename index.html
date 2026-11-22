@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>姜澜 | AI 漫剧作品集</title>
+<title>个人简历 | AI 漫剧制作</title>
 <style>
 :root{color-scheme:light;--paper:#f5f3ed;--ink:#171913;--muted:#585a50;--rule:#b9baaf;--accent:#dfea91}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:5rem}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 system-ui,sans-serif}a{color:inherit;text-underline-offset:.24em}a:focus-visible,summary:focus-visible{outline:2px solid #4b5918;outline-offset:5px}.wrap{width:min(1160px,calc(100% - 64px));margin:auto}.top{position:sticky;top:0;z-index:1;background:var(--paper);border-bottom:1px solid var(--rule)}.bar{min-height:65px;display:flex;align-items:center;justify-content:space-between;gap:20px}.bar a{text-decoration:none}.bar a:hover{text-decoration:underline}nav{display:flex;gap:24px;flex-wrap:wrap}.hero{padding:clamp(54px,10vw,136px) 0 54px}h1,h2,h3,p{margin:0}.name{color:var(--muted);font-size:1.2rem}.hero h1{font-size:clamp(2.55rem,9vw,7.3rem);line-height:1.03;letter-spacing:-.075em;margin:12px 0 26px}.hero-bottom{display:flex;gap:22px;justify-content:space-between;align-items:end}.hero-bottom p{max-width:35ch;color:var(--muted)}.action{display:inline-block;background:var(--accent);padding:10px 18px;text-decoration:none;white-space:nowrap}.section{border-top:1px solid var(--rule);padding:38px 0 52px;display:grid;grid-template-columns:minmax(145px,1fr) 3fr;gap:24px}.section h2{font-size:1.4rem}.section h3{font-size:1.12rem}.muted{color:var(--muted)}.entries{display:grid;gap:22px}.entries article+article{border-top:1px solid var(--rule);padding-top:22px}.entries p{margin-top:5px}ul{margin:10px 0 0;padding-left:1.25em}.skills{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:20px}.skills strong{display:block}.skills span{color:var(--muted)}footer{padding:20px 0;border-top:1px solid var(--rule);color:var(--muted)}@media(max-width:650px){.wrap{width:calc(100% - 32px)}nav{gap:13px}.section{grid-template-columns:1fr;gap:14px}.hero-bottom{align-items:start;flex-direction:column}.skills{grid-template-columns:1fr}}
@@ -111,6 +111,7 @@ body:not(.editing) .frame-label,body:not(.editing) #projection-empty,body:not(.e
 body:not(.editing) .cinema-foot{display:none}
 body:not(.editing) .cinema{grid-template-rows:auto minmax(0,1fr)}
 body:not(.editing) .projection{height:clamp(240px,calc(100svh - 90px),840px)}
+.film-preview{pointer-events:none}
 
 :root{--paper:#f2f1eb;--ink:#20211d;--rule:#bcbdb3;--muted:#55584d;--accent:#cddd59}
 .cinema,body:not(.editing) .cinema{height:auto;min-height:0;display:flex;flex-direction:column;gap:0;background:var(--paper);padding:0 clamp(18px,4vw,66px) 34px}
@@ -124,15 +125,24 @@ body:not(.editing) .projection{height:clamp(240px,calc(100svh - 90px),840px)}
 .bar button,.action,.bar a,.cinema-foot p{color:var(--ink);text-shadow:none}.section h2{color:var(--ink)}.hero{padding-block:55px}.name-en{font-size:clamp(2.1rem,4vw,4rem)}.edit-bar{z-index:12}.edit-bar select,.edit-bar input{max-width:100%}
 @media(max-width:650px){.folio-intro{grid-template-columns:1fr 1fr;gap:15px}.folio-wordmark{font-size:clamp(3.8rem,15vw,6rem)}.folio-image{min-height:110px}.folio-image a{font-size:14px;padding:3px 8px;bottom:5px;right:5px}.cinema-head{min-height:52px}.hero{padding-block:32px}.edit-bar{max-height:38svh;overflow:auto}}
 
+
+.cinema,body:not(.editing) .cinema{position:relative;background:#161614;color:#f8f6ee;min-height:92svh;justify-content:center;padding:70px 0 30px}
+.cinema-head{position:absolute;inset:0 0 auto;min-height:65px;padding:0 clamp(18px,4vw,64px);border:0;color:#f8f6ee}.cinema-head a,.cinema .pick,.cinema-head summary{color:#f8f6ee}.cinema .index-panel a{color:#222}.cinema .pick,.cinema-head summary{border-color:#706f67;background:transparent}
+.film-signature{display:flex;align-items:baseline;gap:10px;font-weight:800;letter-spacing:-.055em;font-size:clamp(1.15rem,2.1vw,2rem);text-decoration:none}.film-signature small{font-size:.9rem;letter-spacing:.02em;font-weight:400}
+.projection,body:not(.editing) .projection{background:transparent;height:clamp(315px,68svh,700px);margin:0;isolation:isolate}
+.frame-track{--w:clamp(160px,min(26vw,35svh),310px);padding:0;left:calc(50% - var(--w)/2);right:auto;width:100%;gap:clamp(10px,1.7vw,30px);align-items:center}
+.film-frame{width:var(--w);flex:0 0 var(--w);aspect-ratio:9/16;height:auto;max-height:none;border:0;background:#232320;border-radius:2px;transition:transform .28s ease}
+.projection video{object-fit:contain;max-height:none}.film-strip{flex-wrap:nowrap}.cinema-foot p{color:#eee}.cinema-foot,.editing .film-strip{padding-inline:20px}
+.bio-link{text-decoration:none}.cinema-head summary:hover,.cinema .pick:hover{background:#f1efe6;color:#171713}
+@media(max-width:650px){.cinema,body:not(.editing) .cinema{min-height:78svh;padding-top:62px}.frame-track{--w:min(57vw,34svh);gap:10px}.projection,body:not(.editing) .projection{height:clamp(270px,58svh,540px)}.cinema-tools{gap:8px}.cinema-head{padding-inline:14px}.film-signature small{display:none}}
+
 </style>
 </head>
 <body>
-<div class="edit-bar" id="edit-bar" hidden><strong>直接点击文字修改，改完点保存</strong><button id="save-edits" type="button">保存</button><button id="cancel-edits" type="button">取消</button><label for="edit-film-slot">影片位</label><select id="edit-film-slot"><option value="0">第 1 支</option><option value="1">第 2 支</option><option value="2">第 3 支</option><option value="3">第 4 支</option><option value="4">第 5 支</option><option value="5">第 6 支</option><option value="6">第 7 支</option><option value="7">第 8 支</option></select><label for="edit-film-title">片名</label><input id="edit-film-title" type="text" maxlength="100" placeholder="输入片名"><button type="button" id="upload-film">添加或更换视频</button><a href="#projection">回到视频</a><span id="edit-message" role="status"></span></div>
+<div class="edit-bar" id="edit-bar" hidden><strong>文字和影片会自动保存到此浏览器</strong><button id="save-edits" type="button">保存</button><button id="backup-draft" type="button">下载草稿</button><button id="restore-draft" type="button">打开草稿</button><input id="draft-file" type="file" accept=".comicdraft" hidden><button id="cancel-edits" type="button">撤销本次编辑</button><label for="edit-film-slot">影片位</label><select id="edit-film-slot"><option value="0">第 1 支</option><option value="1">第 2 支</option><option value="2">第 3 支</option><option value="3">第 4 支</option><option value="4">第 5 支</option><option value="5">第 6 支</option><option value="6">第 7 支</option><option value="7">第 8 支</option><option value="8">第 9 支</option></select><label for="edit-film-title">片名</label><input id="edit-film-title" type="text" maxlength="100" placeholder="输入片名"><button type="button" id="upload-film">选择视频（可多选）</button><a href="#projection">回到视频</a><span id="edit-message" role="status"></span></div>
 <section class="cinema" aria-label="作品放映">
-  <div class="cinema-head"><strong>AI 漫剧制作师</strong><div class="cinema-tools"><details class="index-menu"><summary>索引</summary><div class="index-panel"><a href="#projection">作品放映</a><a href="#home">个人简历</a><a href="#contact">联系方式</a></div></details></div></div>
-  <section class="folio-intro" aria-label="姜澜个人作品集"><div class="folio-wordmark" aria-label="Jiang Lan"><span>JIANG</span><span>LAN<span class="folio-dot">.</span></span></div><div class="folio-image"><img alt="《软柿子》的三个角色镜头" width="450" height="264" src="data:image/jpeg;base64,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"><a href="#projection">浏览影片</a></div></section>
-<div class="film-heading"><h2>影片作品</h2><a href="#home">个人简历</a></div>
-<div class="projection" id="projection" tabindex="0" aria-label="影片画廊，使用左右方向键切换"><div class="screen-swipe" aria-hidden="true"></div>
+  <div class="cinema-head"><a class="film-signature" href="#home">JIANG LAN <small>姜澜</small></a><div class="cinema-tools"><a class="bio-link" href="#home">关于我</a><details class="index-menu"><summary>索引</summary><div class="index-panel"><a href="#projection">作品放映</a><a href="#home">个人简历</a><a href="#contact">联系方式</a></div></details></div></div>
+  <div class="projection" id="projection" tabindex="0" aria-label="影片画廊，使用左右方向键切换"><div class="screen-swipe" aria-hidden="true"></div>
     <div class="empty" id="projection-empty"><p>视频加载后将在这里播放。</p></div>
     <video id="showreel" hidden controls muted playsinline loop preload="metadata" aria-label="作品视频"></video>
   </div>
@@ -141,9 +151,9 @@ body:not(.editing) .projection{height:clamp(240px,calc(100svh - 90px),840px)}
   <button type="button" tabindex="-1" data-film="1" aria-pressed="false">02 · 待添加</button>
   <button type="button" tabindex="-1" data-film="2" aria-pressed="false">03 · 待添加</button>
   <button type="button" tabindex="-1" data-film="3" aria-pressed="false">04 · 待添加</button>
-  <button type="button" tabindex="-1" data-film="4" aria-pressed="false">05 · 待添加</button><button type="button" tabindex="-1" data-film="5" aria-pressed="false">06 · 待添加</button><button type="button" tabindex="-1" data-film="6" aria-pressed="false">07 · 待添加</button><button type="button" tabindex="-1" data-film="7" aria-pressed="false">08 · 待添加</button>
+  <button type="button" tabindex="-1" data-film="4" aria-pressed="false">05 · 待添加</button><button type="button" tabindex="-1" data-film="5" aria-pressed="false">06 · 待添加</button><button type="button" tabindex="-1" data-film="6" aria-pressed="false">07 · 待添加</button><button type="button" tabindex="-1" data-film="7" aria-pressed="false">08 · 待添加</button><button type="button" tabindex="-1" data-film="8" aria-pressed="false">09 · 待添加</button>
 </nav>
-<div class="cinema-foot"><input id="video-file" type="file" accept="video/*,.mp4,.webm" hidden><p id="video-status" role="status">软柿子</p></div>
+<div class="cinema-foot"><input id="video-file" multiple type="file" accept="video/*,.mp4,.webm" hidden><p id="video-status" role="status">软柿子</p></div>
 </section>
 <header class="top"><div class="wrap bar"><a href="#home"><strong>姜澜</strong></a><nav aria-label="简历导航"><a href="#skills">技能</a><a href="#contact">联系</a></nav></div></header>
 <main class="wrap" id="home">
@@ -213,15 +223,16 @@ let saved = {};
 let pendingVideos = []; let pendingTitles = []; let activeFilm = 0;
 let localUrl;
 
+const filmLibrary = ["软柿子","ep1(1)","ep1(2)","EP1（11 文件夹）","爆款月亮失约止于盛夏大码男孩西语","微信视频2026-11-22_204752_624","ep1 修改后 1019","ep1","星际EP1"].map((title,i) => ({title,src:i === 0 ? 'showreel.mp4' : 'films/film-' + (i+1) + '.mp4',poster:'films/still-' + (i+1) + '.jpg'}));
 const filmButtons = [...document.querySelectorAll('[data-film]')];
 function filmAt(index) {
-  return pendingVideos[index] || saved.videos?.[index] || (index === 0 ? saved.video : undefined);
+  return index in pendingVideos ? pendingVideos[index] : saved.videos?.[index] || (index === 0 ? saved.video : undefined);
 }
 function customTitle(index) {
   return pendingTitles[index] ?? saved.titles?.[index] ?? '';
 }
 function filmTitle(index) {
-  return customTitle(index).trim() || filmAt(index)?.name?.replace(/\.[^.]+$/, '') || (index === 0 ? '软柿子' : '待添加');
+  return customTitle(index).trim() || filmAt(index)?.name?.replace(/\.[^.]+$/, '') || filmLibrary[index].title;
 }
 function refreshFilmTitles() {
   filmButtons.forEach((button, index) => {
@@ -242,13 +253,14 @@ titleInput.addEventListener('input', () => {
 });
 function selectFilm(index) {
   activeFilm = index;
+  updatePreviews();
   if (video.parentElement !== frames[index]) frames[index].append(video, placeholder);
   filmButtons.forEach((button, position) => {
     button.setAttribute('aria-pressed', position === index);
   });
   refreshFilmTitles();
   const file = filmAt(index);
-  if (file || index === 0) {
+  if (file || filmLibrary[index]) {
     showVideo(file);
     return;
   }
@@ -276,6 +288,32 @@ const frames = filmButtons.map(() => {
   frameTrack.append(frame);
   return frame;
 });
+const previews = frames.map(frame => {
+  const element = document.createElement('video');
+  element.className = 'film-preview';
+  element.muted = true;
+  element.playsInline = true;
+  element.preload = 'auto';
+  element.hidden = true;
+  frame.append(element);
+  return {element, file: undefined, source: ''};
+});
+function updatePreviews() {
+  previews.forEach((preview, index) => {
+    const file = filmAt(index);
+    if (preview.file !== file) {
+      if (preview.source.startsWith('blob:')) URL.revokeObjectURL(preview.source);
+      preview.file = file;
+      preview.source = file ? URL.createObjectURL(file) : '';
+    }
+    const source = preview.source;
+    preview.element.poster = file ? '' : filmLibrary[index].poster;
+    preview.element.hidden = index === activeFilm;
+    const previewSource = source ? source + '#t=0.3' : '';
+    if (previewSource && preview.element.getAttribute('src') !== previewSource) preview.element.src = previewSource;
+    if (!source) preview.element.removeAttribute('src');
+  });
+}
 function renderFramePosition() {
   const first = filmButtons[0].getBoundingClientRect();
   const second = filmButtons[1].getBoundingClientRect();
@@ -301,18 +339,18 @@ function nearestFilm() {
   }, 0);
 }
 
-function centerFilm(index) {
+function centerFilm(index, requestedBehavior) {
   const card = filmButtons[index].getBoundingClientRect();
   const strip = filmStrip.getBoundingClientRect();
   const left = filmStrip.scrollLeft + card.left + card.width / 2 - strip.left - filmStrip.clientWidth / 2;
   const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
-  filmStrip.scrollTo({left, behavior});
+  filmStrip.scrollTo({left, behavior: requestedBehavior || behavior});
 }
 
 filmStrip.addEventListener('scroll', () => {
   renderFramePosition();
   clearTimeout(settleTimer);
-  if (drag || screenDrag) return;
+  if (drag || screenDrag || hoverFrame !== undefined) return;
   settleTimer = setTimeout(() => {
     const index = nearestFilm();
     wheelTarget = index;
@@ -393,14 +431,21 @@ projection.addEventListener('keydown', event => {
   centerFilm(wheelTarget);
 });
 
+let playingFile;
 function showVideo(file) {
+  const key = file || filmLibrary[activeFilm].src;
+  if (!video.hidden && video.hasAttribute('src') && playingFile === key) return;
+  playingFile = key;
   if (localUrl) URL.revokeObjectURL(localUrl);
   localUrl = file ? URL.createObjectURL(file) : undefined;
-  video.src = localUrl || 'showreel.mp4';
+  video.poster = file ? '' : filmLibrary[activeFilm].poster;
+  video.src = localUrl || filmLibrary[activeFilm].src;
   video.hidden = false;
   placeholder.hidden = true;
 
-  video.play().catch(() => {});
+  video.play().catch(error => {
+    if (error.name === 'NotAllowedError' && document.body.classList.contains('editing')) message.textContent = '视频已选中，请点画面下方的播放按钮。';
+  });
 }
 
 function openDatabase() {
@@ -431,7 +476,7 @@ function setEditing(active) {
 }
 
 editButtons.forEach(button => button.addEventListener('click', () => {
-  saved.text = fields.map(field => field.textContent);
+  editStart = captureDraft();
   message.textContent = '';
   setEditing(true);
   slot.value = String(activeFilm);
@@ -445,42 +490,150 @@ upload.addEventListener('click', () => {
 });
 input.addEventListener('change', () => {
   if (!input.files[0]) return;
-  const file = input.files[0];
-  pendingVideos[uploadSlot] = file;
+  const files = Array.from(input.files);
+  const slots = [uploadSlot];
+  for (let step = 1; step < filmButtons.length; step++) {
+    const next = (uploadSlot + step) % filmButtons.length;
+    if (next !== 0 && !filmAt(next)) slots.push(next);
+  }
+  if (files.length > slots.length) {
+    message.textContent = '可放入 ' + slots.length + ' 支影片，请减少本次选择的文件数量。';
+    input.value = '';
+    return;
+  }
+  files.forEach((file,i) => { pendingVideos[slots[i]] = file; });
   syncTitleInput();
-  message.textContent = '第 ' + (uploadSlot + 1) + ' 支已选：' + file.name + '，记得点保存';
+  markChanged();
   selectFilm(uploadSlot);
   wheelTarget = uploadSlot;
-  centerFilm(uploadSlot);
+  clearTimeout(settleTimer);
+  filmStrip.classList.remove('is-hovering');
+  centerFilm(uploadSlot, 'instant');
+  renderFramePosition();
+  projection.scrollIntoView({block:'nearest'});
   input.value = '';
 });
-cancel.addEventListener('click', () => {
-  applyText(saved.text);
-  pendingVideos = []; pendingTitles = []; selectFilm(activeFilm);
-  setEditing(false);
+function captureDraft() {
+  return {resumeRevision: 3, text: fields.map(field => field.textContent), videos: filmButtons.map((_, index) => filmAt(index)), titles: filmButtons.map((_, index) => customTitle(index).trim())};
+}
+document.querySelector('#backup-draft').addEventListener('click', () => {
+  const {videos, ...draft} = captureDraft();
+  const metadata = videos.map(file => file ? {name:file.name,type:file.type,size:file.size} : null);
+  const header = new TextEncoder().encode(JSON.stringify({...draft, metadata}) + '\n');
+  const url = URL.createObjectURL(new Blob([header, ...videos.filter(Boolean)]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = '作品集.comicdraft';
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+  message.textContent = '已请求下载草稿，请检查下载列表。';
 });
-save.addEventListener('click', async () => {
-  save.disabled = cancel.disabled = upload.disabled = slot.disabled = titleInput.disabled = true;
-  const draft = {resumeRevision: 3, text: fields.map(field => field.textContent), videos: filmButtons.map((_, index) => filmAt(index)), titles: filmButtons.map((_, index) => customTitle(index).trim())};
+const draftFile = document.querySelector('#draft-file');
+document.querySelector('#restore-draft').addEventListener('click', () => draftFile.click());
+draftFile.addEventListener('change', async () => {
+  const file = draftFile.files[0];
+  draftFile.value = '';
+  if (!file) return;
   try {
-    const db = await database;
-    await new Promise((resolve, reject) => {
-      const transaction = db.transaction('draft', 'readwrite');
-      transaction.oncomplete = resolve;
-      transaction.onerror = transaction.onabort = () => reject(transaction.error);
-      transaction.objectStore('draft').put(draft, 'resume');
+    const header = new Uint8Array(await file.slice(0, 1048576).arrayBuffer());
+    const end = header.indexOf(10);
+    if (end < 0) throw new Error('Missing header');
+    const data = JSON.parse(new TextDecoder().decode(header.slice(0, end)));
+    if (data.resumeRevision !== 3 || !Array.isArray(data.text) || !Array.isArray(data.titles) || !Array.isArray(data.metadata) || (data.metadata.length < 1 || data.metadata.length > filmButtons.length)) throw new Error('Invalid draft');
+    let offset = end + 1;
+    const videos = data.metadata.map(entry => {
+      if (entry === null) return undefined;
+      if (!Number.isSafeInteger(entry.size) || entry.size < 0 || offset + entry.size > file.size) throw new Error('Invalid video size');
+      const blob = file.slice(offset, offset + entry.size);
+      offset += entry.size;
+      return new File([blob], entry.name, {type:entry.type});
     });
-    saved = draft;
-    pendingVideos = [];
-    pendingTitles = [];
-    refreshFilmTitles();
-    applyText(draft.text);
-    setEditing(false);
+    if (offset !== file.size) throw new Error('Invalid draft size');
+    pendingVideos = videos;
+    pendingTitles = data.titles;
+    applyText(data.text);
+    selectFilm(activeFilm);
+    syncTitleInput();
+    markChanged();
   } catch {
-    message.textContent = '保存失败，当前改动还在页面上。';
-  } finally {
-    save.disabled = cancel.disabled = upload.disabled = slot.disabled = titleInput.disabled = false;
+    message.textContent = '打开失败，请选择从这个编辑页下载的草稿。';
   }
+});
+
+let editStart;
+let previousFiles = [];
+let migrateFiles = false;
+let changeNumber = 0;
+let storedNumber = 0;
+let timer;
+let queue = Promise.resolve();
+function markChanged() {
+  changeNumber++;
+  message.textContent = '正在保存…';
+  clearTimeout(timer);
+  timer = setTimeout(flushDraft, 350);
+}
+function flushDraft() {
+  clearTimeout(timer);
+  const revision = changeNumber;
+  const draft = captureDraft();
+  const write = async () => {
+    if (storedNumber === revision) return true;
+    try {
+      const db = await database;
+      await new Promise((resolve,reject) => {
+        const tx = db.transaction('draft','readwrite');
+        tx.oncomplete = resolve;
+        tx.onabort = () => reject(tx.error);
+        const store = tx.objectStore('draft');
+        const {videos,...metadata} = draft;
+        store.put({...metadata, splitFiles:true}, 'resume');
+        videos.forEach((file,i) => {
+          if (!migrateFiles && file === previousFiles[i]) return;
+          if (file) store.put(file,'film-'+i);
+          else store.delete('film-'+i);
+        });
+      });
+      previousFiles = draft.videos.slice();
+      migrateFiles = false;
+      storedNumber = revision;
+      if (revision === changeNumber) message.textContent = '已保存到此浏览器';
+      return true;
+    } catch(error) {
+      message.textContent = (error?.name === 'QuotaExceededError' ? '浏览器空间不足。' : '浏览器保存失败（' + (error?.name || '存储错误') + '）。') + '请点「下载草稿」备份文字和视频。';
+      return false;
+    }
+  };
+  queue = queue.then(write,write);
+  return queue;
+}
+fields.forEach(field => field.addEventListener('input', markChanged));
+titleInput.addEventListener('input',markChanged);
+
+window.addEventListener('beforeunload', event => {
+  if (changeNumber !== storedNumber) {event.preventDefault();event.returnValue='';}
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && changeNumber !== storedNumber) flushDraft();
+});
+async function finishEdits() {
+  const revision = changeNumber;
+  if (!await flushDraft() || revision !== changeNumber) return;
+  saved = captureDraft();
+  pendingVideos = [];
+  pendingTitles = [];
+  applyText(saved.text);
+  setEditing(false);
+}
+save.addEventListener('click',finishEdits);
+cancel.addEventListener('click',async () => {
+  applyText(editStart.text);
+  pendingVideos = [...editStart.videos];
+  pendingTitles = [...editStart.titles];
+  selectFilm(activeFilm);
+  syncTitleInput();
+  markChanged();
+  await finishEdits();
 });
 video.addEventListener('error', () => {
   if (!video.hasAttribute('src')) return;
@@ -491,15 +644,22 @@ video.addEventListener('error', () => {
 });
 
 editButtons.forEach(button => button.disabled = true);
-selectFilm(0);
+selectFilm(1);
+centerFilm(1, "instant");
 renderFramePosition();
 window.addEventListener('resize', renderFramePosition);
 const database = openDatabase();
 database.then(db => {
-  const request = db.transaction('draft').objectStore('draft').get('resume');
-  request.onsuccess = () => {
+  const tx = db.transaction('draft');
+  const store = tx.objectStore('draft');
+  const files = filmButtons.map((_,i) => store.get('film-'+i));
+  const request = store.get('resume');
+  tx.oncomplete = () => {
     if (request.result) {
       saved = request.result;
+      if (saved.splitFiles) saved.videos = files.map(item => item.result);
+      else migrateFiles = true;
+      previousFiles = filmButtons.map((_,i) => filmAt(i));
       if (saved.resumeRevision === 2 && Array.isArray(saved.text)) {
         saved = {...saved, resumeRevision: 3, text: [...saved.text.slice(0, 3), ...saved.text.slice(6)]};
       }
@@ -508,7 +668,7 @@ database.then(db => {
     }
     editButtons.forEach(button => button.disabled = false);
   };
-  request.onerror = () => editButtons.forEach(button => button.disabled = false);
+  tx.onabort = () => editButtons.forEach(button => button.disabled = false);
 }).catch(() => editButtons.forEach(button => button.disabled = false));
 const resumeBody = document.querySelector('main');
 const interactiveText = '.name-en, .hero h1, main p, .section h2, .section h3, .section li, .work-details dt, .work-details dd';
@@ -520,6 +680,7 @@ function sweepText(event) {
   setTimeout(() => target.classList.remove('text-sweep'), 790);
 }
 resumeBody.addEventListener('click', sweepText);
+let hoverPoint;
 let hoverTarget;
 let hoverFrame;
 function driftFilmStrip() {
@@ -529,6 +690,12 @@ function driftFilmStrip() {
   if (Math.abs(distance) > 1) {
     filmStrip.scrollLeft += Math.sign(distance) * Math.max(1, Math.abs(distance) * 0.09);
     hoverFrame = requestAnimationFrame(driftFilmStrip);
+  } else {
+    const hoveredFrame = hoverPoint && document.elementFromPoint(hoverPoint.x, hoverPoint.y)?.closest(".film-frame");
+    const hoveredIndex = frames.indexOf(hoveredFrame);
+    const index = hoveredIndex >= 0 ? hoveredIndex : nearestFilm();
+    wheelTarget = index;
+    if (index !== activeFilm) selectFilm(index);
   }
 }
 function stopHoverDrift() {
@@ -544,6 +711,7 @@ function stopHoverDrift() {
 projection.addEventListener('pointermove', event => {
   if (event.pointerType !== 'mouse' || event.buttons || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const rect = projection.getBoundingClientRect();
+  hoverPoint = {x:event.clientX, y:event.clientY};
   const fraction = (event.clientX - rect.left) / rect.width;
   hoverTarget = Math.max(0, Math.min(1, (fraction - 0.08) / 0.84)) * (filmStrip.scrollWidth - filmStrip.clientWidth);
   filmStrip.classList.add('is-hovering');
@@ -555,6 +723,10 @@ projection.addEventListener('wheel', stopHoverDrift, {passive:true});
 </script>
 </body>
 </html>
+
+
+
+
 
 
 
