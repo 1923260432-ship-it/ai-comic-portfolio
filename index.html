@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>姜澜 | AI 漫剧作品集</title>
+<style>
+:root{color-scheme:light;--paper:#f5f3ed;--ink:#171913;--muted:#585a50;--rule:#b9baaf;--accent:#dfea91}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:5rem}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 system-ui,sans-serif}a{color:inherit;text-underline-offset:.24em}a:focus-visible,summary:focus-visible{outline:2px solid #4b5918;outline-offset:5px}.wrap{width:min(1160px,calc(100% - 64px));margin:auto}.top{position:sticky;top:0;z-index:1;background:var(--paper);border-bottom:1px solid var(--rule)}.bar{min-height:65px;display:flex;align-items:center;justify-content:space-between;gap:20px}.bar a{text-decoration:none}.bar a:hover{text-decoration:underline}nav{display:flex;gap:24px;flex-wrap:wrap}.hero{padding:clamp(54px,10vw,136px) 0 54px}h1,h2,h3,p{margin:0}.name{color:var(--muted);font-size:1.2rem}.hero h1{font-size:clamp(2.55rem,9vw,7.3rem);line-height:1.03;letter-spacing:-.075em;margin:12px 0 26px}.hero-bottom{display:flex;gap:22px;justify-content:space-between;align-items:end}.hero-bottom p{max-width:35ch;color:var(--muted)}.action{display:inline-block;background:var(--accent);padding:10px 18px;text-decoration:none;white-space:nowrap}.section{border-top:1px solid var(--rule);padding:38px 0 52px;display:grid;grid-template-columns:minmax(145px,1fr) 3fr;gap:24px}.section h2{font-size:1.4rem}.section h3{font-size:1.12rem}.muted{color:var(--muted)}.entries{display:grid;gap:22px}.entries article+article{border-top:1px solid var(--rule);padding-top:22px}.entries p{margin-top:5px}ul{margin:10px 0 0;padding-left:1.25em}.skills{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:20px}.skills strong{display:block}.skills span{color:var(--muted)}footer{padding:20px 0;border-top:1px solid var(--rule);color:var(--muted)}@media(max-width:650px){.wrap{width:calc(100% - 32px)}nav{gap:13px}.section{grid-template-columns:1fr;gap:14px}.hero-bottom{align-items:start;flex-direction:column}.skills{grid-template-columns:1fr}}
+.cinema{min-height:100svh;background:#100f12;color:#fff;position:relative;display:grid;grid-template-rows:auto 1fr auto;padding:clamp(18px,4vw,44px);gap:18px}.cinema-head,.cinema-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}.cinema-head a,.cinema-foot a{color:inherit}.projection{display:grid;place-items:center;min-width:0;position:relative;background:radial-gradient(ellipse at center,#292531,#17151a 70%);border:1px solid #403943}.projection video{width:100%;height:100%;max-height:73svh;object-fit:contain;background:#080808}.projection video[hidden]{display:none}.empty{text-align:center;padding:24px}.empty h1{font-size:clamp(2rem,6vw,5rem);letter-spacing:-.055em}.empty p,.cinema-foot p{color:#d1c8d4}.pick{display:inline-block;border:1px solid #aaa1ad;border-radius:3px;padding:8px 13px;color:#fff;background:transparent;font:inherit;cursor:pointer}.pick:hover{background:#332c38}.pick:focus-visible,.cinema a:focus-visible{outline:2px solid white;outline-offset:4px}
+[hidden]{display:none!important}.cinema-tools,.edit-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.edit-bar{position:sticky;top:0;z-index:3;background:#dfea91;padding:12px clamp(16px,4vw,44px);color:#171913}.edit-bar button,.bar button{font:inherit;cursor:pointer;padding:5px 10px}.editing [contenteditable=plaintext-only]{outline:1px dashed #68733c;outline-offset:3px;white-space:pre-wrap}.editing .top{position:static}
+/* Portfolio art direction */
+:root{--paper:#eeede8;--ink:#171714;--muted:#565650;--rule:#b4b3a9;--accent:#e4fa79}
+.cinema{background:var(--paper);color:var(--ink);padding:0 max(24px,calc((100vw - 1320px)/2)) 26px;min-height:100svh;gap:14px;grid-template-rows:auto auto minmax(0,1fr) auto}
+.cinema-head{min-height:67px;border-bottom:1px solid var(--rule);font-size:14px}
+.cinema-tools{gap:18px}.cinema-tools a{text-decoration:none}.cinema-tools a:hover{text-decoration:underline}
+.cinema .pick,.bar button{color:var(--ink);background:transparent;border:1px solid var(--rule);border-radius:0;padding:7px 12px;font:inherit;font-size:14px}.cinema .pick:hover,.bar button:hover{background:var(--accent)}
+.cinema a:focus-visible,.pick:focus-visible{outline:2px solid #404a18;outline-offset:4px}
+.screen-title{font-size:clamp(2.4rem,8.8vw,8rem);line-height:.97;letter-spacing:-.075em;margin:clamp(8px,2vw,30px) 0 4px;font-weight:750}
+.projection{background:#161616;border:0;min-height:clamp(280px,49svh,680px);color:#fff;overflow:hidden}
+.projection video{display:block;width:100%;height:100%;max-height:62svh;background:#161616;object-fit:contain}
+.empty p{color:#d1c8d4}.cinema-foot{min-height:40px;border-bottom:1px solid var(--rule);padding-bottom:11px}
+.cinema-foot p{color:var(--ink);font-weight:650}.cinema-foot a{margin-left:auto;text-decoration:none;font-size:14px}.cinema-foot a:hover{text-decoration:underline}
+.top{background:var(--paper)}.hero{padding:clamp(58px,9vw,114px) 0 55px}.hero h1{font-size:clamp(2.5rem,7vw,6.6rem)}
+.section{padding:30px 0 44px;grid-template-columns:minmax(145px,1fr) 2.3fr}.section h2{font-size:1rem}.section h3{font-size:clamp(1.2rem,2.5vw,1.8rem)}
+.action{border:1px solid var(--ink);background:transparent}.action:hover{background:var(--accent)}.edit-bar{background:var(--accent)}
+@media(max-width:650px){.cinema{padding-inline:16px;min-height:88svh}.cinema-head{padding-block:12px;gap:10px}.cinema-tools{gap:10px}.projection{min-height:240px}.projection video{max-height:56svh}.section{grid-template-columns:1fr}.bar{padding-block:10px}.bar nav{justify-content:flex-end}}
+/* Screening room */
+:root{--paper:#121211;--ink:#f4f1e9;--muted:#bab7ad;--rule:#3c3a34;--accent:#e6b994}
+.cinema{min-height:100svh;padding:0 clamp(18px,5vw,88px) 24px;gap:0;grid-template-rows:auto minmax(0,1fr) auto;background:#121211}
+.cinema-head{min-height:74px;border-color:#34312d}.cinema-head strong{font-weight:600;letter-spacing:.06em}.cinema-tools{gap:18px}
+.cinema .pick,.bar button{border-color:#625c51;color:var(--ink);border-radius:999px;padding:6px 13px}.cinema .pick:hover,.bar button:hover{background:var(--accent);color:#181410}
+.screen-title{display:none}.projection{margin:20px 0 0;background:#090909;min-height:0;height:min(68svh,760px);border-radius:5px}
+.projection video{width:100%;height:100%;max-height:none;background:#090909;object-fit:contain}
+.cinema-foot{padding:18px 0 6px;border-bottom:0;align-items:center}
+.cinema-foot p{font-weight:600;font-size:clamp(1.4rem,3vw,2.5rem);line-height:1.1;letter-spacing:-.035em}
+.cinema-foot a{color:var(--muted)}.cinema-tools a{color:var(--ink)}.cinema a:focus-visible,.pick:focus-visible,.bar button:focus-visible{outline-color:var(--accent)}
+.top{border-color:var(--rule)}.bar{min-height:60px}.hero{padding:clamp(65px,11vw,140px) 0 65px}.hero h1{margin-top:10px}.action:hover{color:#181410}
+.section{padding:30px 0 46px}.section h2{color:var(--accent);font-weight:550}.section h3{font-weight:600}.skills{gap:24px}
+.edit-bar{color:#201a15}.editing [contenteditable=plaintext-only]{outline-color:var(--accent)}
+@media(max-width:650px){.cinema{min-height:100svh;align-content:start;grid-template-rows:auto auto auto}.cinema-head{min-height:60px}.cinema-tools{gap:10px}.projection{margin-top:14px;height:64svh;min-height:220px}.cinema-foot{padding-top:14px}.bar nav{gap:12px}}
+/* Full-screen screening and project index */
+:root{--paper:#141412;--ink:#f1efe6;--muted:#bcb9af;--rule:#42403a;--accent:#f0d9ab}
+.cinema{height:100svh;min-height:420px;display:block;isolation:isolate;padding:0;background:#0b0b0a}
+.projection{position:absolute;inset:0;height:auto;margin:0;border-radius:0;z-index:-1;background:#0b0b0a}
+.projection video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0b0b0a}
+.projection:has(video:not([hidden])):after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(#0009,transparent 22%,transparent 72%,#000a)}
+.cinema-head,.cinema-foot{position:absolute;left:0;right:0;padding-inline:clamp(16px,4vw,62px);border:0;min-height:0}
+.cinema-head{top:0;padding-block:19px;align-items:flex-start}
+.cinema-head strong{font-size:14px;letter-spacing:0;font-weight:650}
+.cinema-foot{bottom:0;padding-block:18px 48px;align-items:end;justify-content:space-between;pointer-events:none}
+.cinema-foot :is(button,a){pointer-events:auto}.cinema-foot p{color:#fff;font-size:clamp(1.75rem,5vw,4.5rem);font-weight:630;overflow-wrap:anywhere;max-width:75%}
+.cinema-head strong,.cinema-foot p,.cinema-foot a{color:#fff;text-shadow:0 1px 12px #000}
+.cinema .pick,.index-menu summary{border:1px solid #ffffff50;background:#171715d9;color:#fff;border-radius:0;padding:7px 11px;font:inherit;font-size:14px;cursor:pointer}
+.index-menu{position:relative}.index-menu summary{list-style:none}.index-menu summary::-webkit-details-marker{display:none}.index-menu summary:hover,.index-menu summary:focus-visible{background:#f1efe6;color:#141412}
+.index-panel{position:absolute;right:0;top:calc(100% + 10px);width:min(320px,calc(100vw - 32px));background:#f1efe6;color:#141412;padding:16px;box-shadow:0 10px 35px #0007;display:grid;gap:0}
+.index-panel a,.index-panel .edit-start{display:block;width:100%;padding:10px 4px;background:transparent;color:inherit;border:0;border-bottom:1px solid #b8b4aa;text-align:left;border-radius:0;font:inherit;text-decoration:none}.index-panel a:hover,.index-panel .edit-start:hover{background:#e2dccd;text-decoration:none}.index-panel a:last-of-type{border-bottom:0}
+.empty{color:#fff}.section h2{color:var(--muted)}.action{border-color:var(--rule)}.top{position:static}.bar a,.bar button{font-size:14px}
+@media(max-width:650px){.cinema-foot{padding-bottom:48px}.cinema-head{padding-block:14px}.cinema-foot p{max-width:70%}}
+.work-history{padding-bottom:clamp(48px,7vw,90px)}.work-details{margin:24px 0 0}.work-details>div{display:grid;grid-template-columns:minmax(80px,1fr) 4fr;gap:12px;border-top:1px solid var(--rule);padding:16px 0}.work-details dt{color:var(--muted)}.work-details dd{margin:0}@media(max-width:650px){.work-details>div{grid-template-columns:1fr;gap:4px}}
+.film-strip{position:absolute;z-index:1;inset:auto clamp(16px,4vw,62px) 98px;display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;overscroll-behavior-x:contain;padding:5px 4px 9px;scrollbar-color:#d9c8ab #222}
+.film-strip button{flex:0 0 clamp(145px,20vw,245px);scroll-snap-align:center;text-align:left;border:1px solid #ffffff55;background:#111e;color:#fff;font:inherit;padding:14px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.film-strip button[aria-pressed=true]{background:#f0d9ab;color:#141412;border-color:#f0d9ab}.film-strip button:focus-visible{outline:2px solid white;outline-offset:2px}
+.film-strip{--film-width:clamp(145px,23vw,260px);padding-inline:max(4px,calc(50vw - clamp(16px,4vw,62px) - var(--film-width)/2));scroll-snap-type:x mandatory;scrollbar-width:none;cursor:grab;touch-action:pan-x;user-select:none;mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+.film-strip::-webkit-scrollbar{display:none}.film-strip.is-dragging{cursor:grabbing;scroll-snap-type:none}
+.film-strip button{flex-basis:var(--film-width);text-align:center;cursor:inherit;opacity:.52;transform:scale(.91);transition:opacity .23s,transform .23s,background .23s}.film-strip button[aria-pressed=true]{opacity:1;transform:scale(1)}
+@media(prefers-reduced-motion:reduce){.film-strip button{transition:none}}
+.screen-swipe{position:absolute;z-index:0;inset:0 0 56px;touch-action:pan-y;cursor:grab}.screen-swipe.is-dragging{cursor:grabbing}.cinema-head,.cinema-foot{z-index:2;pointer-events:none}.cinema-head :is(button,a,summary){pointer-events:auto}.index-panel{pointer-events:auto}.film-strip{z-index:1}
+[data-work-field]{min-height:1.65em}.editing [data-work-field]:empty::before{content:attr(data-placeholder);color:var(--muted);pointer-events:none}
+</style>
+</head>
+<body>
+<div class="edit-bar" id="edit-bar" hidden><strong>直接点击文字修改，改完点保存</strong><button id="save-edits" type="button">保存</button><button id="cancel-edits" type="button">取消</button><label for="edit-film-slot">影片位</label><select id="edit-film-slot"><option value="0">第 1 支</option><option value="1">第 2 支</option><option value="2">第 3 支</option><option value="3">第 4 支</option><option value="4">第 5 支</option></select><label for="edit-film-title">片名</label><input id="edit-film-title" type="text" maxlength="100" placeholder="输入片名"><button type="button" id="upload-film">添加或更换视频</button><a href="#projection">回到视频</a><span id="edit-message" role="status"></span></div>
+<section class="cinema" aria-label="作品放映">
+  <div class="cinema-head"><strong>AI 漫剧制作师</strong><div class="cinema-tools"><details class="index-menu"><summary>索引</summary><div class="index-panel"><a href="#projection">作品放映</a><a href="#projects">项目经历</a><a href="#home">个人简历</a><a href="#contact">联系方式</a></div></details></div></div>
+  <div class="screen-swipe" aria-hidden="true"></div><div class="projection" id="projection">
+    <div class="empty" id="projection-empty"><p>视频加载后将在这里播放。</p></div>
+    <video id="showreel" hidden controls muted playsinline loop preload="metadata" aria-label="作品视频"></video>
+  </div>
+  <nav class="film-strip" tabindex="0" aria-label="滑动选择影片，也可用左右方向键">
+  <button type="button" tabindex="-1" data-film="0" aria-pressed="true">01 · 软柿子</button>
+  <button type="button" tabindex="-1" data-film="1" aria-pressed="false">02 · 待添加</button>
+  <button type="button" tabindex="-1" data-film="2" aria-pressed="false">03 · 待添加</button>
+  <button type="button" tabindex="-1" data-film="3" aria-pressed="false">04 · 待添加</button>
+  <button type="button" tabindex="-1" data-film="4" aria-pressed="false">05 · 待添加</button>
+</nav>
+<div class="cinema-foot"><input id="video-file" type="file" accept="video/*,.mp4,.webm" hidden><p id="video-status" role="status">软柿子</p><a href="#projects">项目经历</a></div>
+</section>
+<header class="top"><div class="wrap bar"><a href="#home"><strong>姜澜</strong></a><nav aria-label="简历导航"><a href="#projects">项目</a><a href="#skills">技能</a><a href="#contact">联系</a></nav></div></header>
+<main class="wrap" id="home">
+<section class="hero" aria-labelledby="role">
+<p class="name">姜澜</p><h1 id="role">AI 漫剧制作师</h1>
+<div class="hero-bottom"><p>来自杭州，毕业于浙江万里学院会展经济与管理专业。有场馆运营、活动执行、新媒体内容与跨境电商运营经历。</p><a class="action" href="#projects">查看项目经历</a></div>
+</section>
+<section class="section" id="projects"><h2>项目经历</h2><div class="entries">
+<article><h3>富阳文旅项目</h3><p>为富阳文旅赛道制作抖音视频。</p></article>
+</div></section>
+<section class="section" id="skills"><h2>技能与证书</h2><div class="entries">
+<p>通过大学英语四六级，雅思 6.0。可用英语进行日常交流，快速阅读英文文档和书籍。</p>
+<p>通过全国计算机二级考试，熟练使用 Office 等办公软件。持 C2 驾照。</p>
+</div></section>
+<section class="section work-history"><h2>工作经历</h2><div class="entries">
+<article><h3>漫剧制作</h3><dl class="work-details">
+<div><dt>任职时间与团队</dt><dd data-work-field data-placeholder="点击填写"></dd></div>
+<div><dt>主要职责</dt><dd data-work-field data-placeholder="点击填写"></dd></div>
+<div><dt>参与项目</dt><dd data-work-field data-placeholder="点击填写"></dd></div>
+<div><dt>交付成果</dt><dd data-work-field data-placeholder="点击填写"></dd></div>
+</dl></article>
+<article><h3>浙江大丰文化有限公司 · 亚运会博物馆运营</h3><p class="muted">2025.02 起（旧简历记为至今）</p><ul>
+<li>负责政务、研学及旅行团讲解与引导，日均讲解 2–3 场，累计服务超过 5,000 人次，接待零投诉。</li>
+<li>协助文创商店销售、陈列、收银及库存管理，日均协助完成销售额 2,000 元。</li>
+<li>负责展厅设备巡查、故障上报及基础维护，累计巡检 300 次；完成月度或季度库存盘点 40 次。</li>
+<li>参与研学、科普互动、节日特展等 6 场活动的策划及现场执行。</li>
+<li>负责小红书策划、文案、图文排版与发布，累计发布 5 篇笔记，阅读量 3,000+。</li>
+</ul></article>
+<article><h3>宁波美学日用品公司 · 达人 BD、亚马逊运营</h3><p class="muted">2024.10 – 2024.12</p><ul>
+<li>使用 Woto 每周向海外 TikTok 达人发出 1,000+ 封邮件，邀约拍摄宣传视频，回复率 80%，并跟进合作。</li>
+<li>运营 TikTok 矩阵账号，审核达人带货视频并进行后台流量投放。</li>
+<li>负责亚马逊商品上架、客户邮件及复购记录，并协助策划节日定制礼物卡。</li>
+</ul></article>
+<article><h3>杭州临空会展有限公司 · 销售经理</h3><p class="muted">2024.07 – 2024.08</p><ul>
+<li>搜集华东地区会展主办方信息，通过 Excel 管理客户资料并建立联系。</li>
+<li>邀约并接待客户参观杭州大会展中心，介绍场馆租赁信息。</li>
+<li>跟进客户、协助签订合同并备份，与市场部交接。</li>
+</ul></article>
+<article><h3>杭州国家电网拱墅供电分公司 · 营业厅业务员</h3><p class="muted">2023.07 – 2023.08</p><p>协助处理工单、联系客户及催缴电费。</p></article>
+</div></section>
+<section class="section"><h2>教育背景</h2><div class="entries"><article>
+<h3>浙江万里学院 · 会展经济与管理（本科）</h3><p class="muted">2021.09 – 2025.06 · GPA 3.5</p><ul>
+<li>浙江省会展策划大赛省金奖，互联网＋校赛前十。</li>
+<li>杭州亚运会志愿者、杭州环保志愿者。</li>
+</ul></article></div></section>
+<section class="section" id="contact"><h2>联系方式</h2><div class="entries"><p>邮箱　1923260432@qq.com</p></div></section>
+</main>
+<footer><div class="wrap">姜澜 · AI 漫剧作品集</div></footer>
+<script>
+const video = document.querySelector('#showreel');
+const input = document.querySelector('#video-file');
+
+const placeholder = document.querySelector('#projection-empty');
+const status = document.querySelector('#video-status');
+const bar = document.querySelector('#edit-bar');
+const message = document.querySelector('#edit-message');
+const slot = document.querySelector('#edit-film-slot');
+const titleInput = document.querySelector('#edit-film-title');
+const upload = document.querySelector('#upload-film');
+let uploadSlot;
+const save = document.querySelector('#save-edits');
+const cancel = document.querySelector('#cancel-edits');
+const indexMenu = document.querySelector('.index-menu');
+indexMenu.querySelector('.index-panel').addEventListener('click', event => {
+  if (event.target.closest('a, button')) indexMenu.open = false;
+});
+const editButtons = [...document.querySelectorAll('.edit-start')];
+const fields = [...document.querySelectorAll('main p, main h2, main h3, main li:not(:has(strong)), main li strong, main li span, #role'), ...document.querySelectorAll('[data-work-field]')];
+let saved = {};
+let pendingVideos = []; let pendingTitles = []; let activeFilm = 0;
+let localUrl;
+
+const filmButtons = [...document.querySelectorAll('[data-film]')];
+function filmAt(index) {
+  return pendingVideos[index] || saved.videos?.[index] || (index === 0 ? saved.video : undefined);
+}
+function customTitle(index) {
+  return pendingTitles[index] ?? saved.titles?.[index] ?? '';
+}
+function filmTitle(index) {
+  return customTitle(index).trim() || filmAt(index)?.name?.replace(/\.[^.]+$/, '') || (index === 0 ? '软柿子' : '待添加');
+}
+function refreshFilmTitles() {
+  filmButtons.forEach((button, index) => {
+    button.textContent = String(index + 1).padStart(2, '0') + ' · ' + filmTitle(index);
+  });
+  status.textContent = filmTitle(activeFilm);
+}
+function syncTitleInput() {
+  const index = Number(slot.value);
+  titleInput.value = customTitle(index);
+  titleInput.placeholder = filmTitle(index);
+}
+slot.addEventListener('change', syncTitleInput);
+titleInput.addEventListener('input', () => {
+  pendingTitles[Number(slot.value)] = titleInput.value;
+  refreshFilmTitles();
+});
+function selectFilm(index) {
+  activeFilm = index;
+  filmButtons.forEach((button, position) => {
+    button.setAttribute('aria-pressed', position === index);
+  });
+  refreshFilmTitles();
+  const file = filmAt(index);
+  if (file || index === 0) {
+    showVideo(file);
+    return;
+  }
+  video.pause();
+  video.removeAttribute('src');
+  video.load();
+  if (localUrl) URL.revokeObjectURL(localUrl);
+  localUrl = undefined;
+  video.hidden = true;
+  placeholder.hidden = false;
+  placeholder.querySelector('p').textContent = '这个影片位还没有视频。进入编辑模式后可添加。';
+
+}
+const filmStrip = document.querySelector('.film-strip');
+let settleTimer;
+let drag;
+let wheelTarget = 0;
+
+function nearestFilm() {
+  const center = filmStrip.getBoundingClientRect().left + filmStrip.clientWidth / 2;
+  return filmButtons.reduce((best, button, index) => {
+    const distance = element => {
+      const rect = element.getBoundingClientRect();
+      return Math.abs(rect.left + rect.width / 2 - center);
+    };
+    return distance(button) < distance(filmButtons[best]) ? index : best;
+  }, 0);
+}
+
+function centerFilm(index) {
+  const card = filmButtons[index].getBoundingClientRect();
+  const strip = filmStrip.getBoundingClientRect();
+  const left = filmStrip.scrollLeft + card.left + card.width / 2 - strip.left - filmStrip.clientWidth / 2;
+  const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
+  filmStrip.scrollTo({left, behavior});
+}
+
+filmStrip.addEventListener('scroll', () => {
+  clearTimeout(settleTimer);
+  if (drag) return;
+  settleTimer = setTimeout(() => {
+    const index = nearestFilm();
+    wheelTarget = index;
+    if (index !== activeFilm) selectFilm(index);
+  }, 120);
+}, {passive:true});
+
+const screenSwipe = document.querySelector('.screen-swipe');
+let screenDrag;
+screenSwipe.addEventListener('pointerdown', event => {
+  if (!event.isPrimary || event.button !== 0) return;
+  screenDrag = {id:event.pointerId, x:event.clientX};
+  screenSwipe.setPointerCapture(event.pointerId);
+  screenSwipe.classList.add('is-dragging');
+});
+function endScreenDrag(event) {
+  if (screenDrag?.id !== event.pointerId) return;
+  const distance = screenDrag.x - event.clientX;
+  screenDrag = undefined;
+  screenSwipe.classList.remove('is-dragging');
+  if (event.type !== 'pointerup' || Math.abs(distance) < 44) return;
+  wheelTarget = Math.max(0, Math.min(filmButtons.length - 1, wheelTarget + Math.sign(distance)));
+  centerFilm(wheelTarget);
+}
+screenSwipe.addEventListener('pointerup', endScreenDrag);
+screenSwipe.addEventListener('pointercancel', endScreenDrag);
+screenSwipe.addEventListener('lostpointercapture', endScreenDrag);
+
+let lastWheel = -Infinity;
+const cinema = document.querySelector('.cinema');
+cinema.addEventListener('wheel', event => {
+  const motion = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+  if (!motion || event.ctrlKey || event.target.closest('.index-menu, .cinema-head, .cinema-foot')) return;
+  const next = Math.max(0, Math.min(filmButtons.length - 1, wheelTarget + Math.sign(motion)));
+  if (next === wheelTarget && event.timeStamp - lastWheel > 400 && !filmStrip.contains(event.target)) return;
+  event.preventDefault();
+  if (next === wheelTarget || event.timeStamp - lastWheel < 280) return;
+  lastWheel = event.timeStamp;
+  wheelTarget = next;
+  centerFilm(next);
+}, {passive:false});
+
+filmStrip.addEventListener('pointerdown', event => {
+  if (event.pointerType !== 'mouse' || event.button !== 0) return;
+  clearTimeout(settleTimer);
+  drag = {id:event.pointerId, x:event.clientX, left:filmStrip.scrollLeft};
+  filmStrip.setPointerCapture(event.pointerId);
+  filmStrip.classList.add('is-dragging');
+});
+filmStrip.addEventListener('pointermove', event => {
+  if (drag?.id === event.pointerId) filmStrip.scrollLeft = drag.left + drag.x - event.clientX;
+});
+function finishDrag(event) {
+  if (drag?.id !== event.pointerId) return;
+  const index = nearestFilm();
+  drag = undefined;
+  filmStrip.classList.remove('is-dragging');
+  centerFilm(index);
+  wheelTarget = index;
+  if (index !== activeFilm) selectFilm(index);
+}
+filmStrip.addEventListener('pointerup', finishDrag);
+filmStrip.addEventListener('lostpointercapture', finishDrag);
+filmStrip.addEventListener('keydown', event => {
+  if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+  event.preventDefault();
+  wheelTarget = Math.max(0, Math.min(filmButtons.length - 1, wheelTarget + (event.key === 'ArrowRight' ? 1 : -1)));
+  centerFilm(wheelTarget);
+});
+
+function showVideo(file) {
+  if (localUrl) URL.revokeObjectURL(localUrl);
+  localUrl = file ? URL.createObjectURL(file) : undefined;
+  video.src = localUrl || 'showreel.mp4';
+  video.hidden = false;
+  placeholder.hidden = true;
+
+  video.play().catch(() => {});
+}
+
+function openDatabase() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('comic-resume', 1);
+    request.onupgradeneeded = () => request.result.createObjectStore('draft');
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+function applyText(values) {
+  if (!values) return;
+  fields.forEach((field, index) => {
+    if (typeof values[index] === 'string') field.textContent = values[index];
+  });
+  document.querySelector('.bar strong').textContent = document.querySelector('.name').textContent;
+}
+
+function setEditing(active) {
+  bar.hidden = !active;
+  editButtons.forEach(button => button.hidden = active);
+  document.body.classList.toggle('editing', active);
+  fields.forEach(field => {
+    if (active) field.setAttribute('contenteditable', 'plaintext-only');
+    else field.removeAttribute('contenteditable');
+  });
+}
+
+editButtons.forEach(button => button.addEventListener('click', () => {
+  saved.text = fields.map(field => field.textContent);
+  message.textContent = '';
+  setEditing(true);
+  slot.value = String(activeFilm);
+  syncTitleInput();
+  document.querySelector('#home').scrollIntoView();
+  document.querySelector('.name').focus({preventScroll:true});
+}));
+upload.addEventListener('click', () => {
+  uploadSlot = Number(slot.value);
+  input.click();
+});
+input.addEventListener('change', () => {
+  if (!input.files[0]) return;
+  const file = input.files[0];
+  pendingVideos[uploadSlot] = file;
+  syncTitleInput();
+  message.textContent = '第 ' + (uploadSlot + 1) + ' 支已选：' + file.name + '，记得点保存';
+  selectFilm(uploadSlot);
+  wheelTarget = uploadSlot;
+  centerFilm(uploadSlot);
+  input.value = '';
+});
+cancel.addEventListener('click', () => {
+  applyText(saved.text);
+  pendingVideos = []; pendingTitles = []; selectFilm(activeFilm);
+  setEditing(false);
+});
+save.addEventListener('click', async () => {
+  save.disabled = cancel.disabled = upload.disabled = slot.disabled = titleInput.disabled = true;
+  const draft = {resumeRevision: 2, text: fields.map(field => field.textContent), videos: filmButtons.map((_, index) => filmAt(index)), titles: filmButtons.map((_, index) => customTitle(index).trim())};
+  try {
+    const db = await database;
+    await new Promise((resolve, reject) => {
+      const transaction = db.transaction('draft', 'readwrite');
+      transaction.oncomplete = resolve;
+      transaction.onerror = transaction.onabort = () => reject(transaction.error);
+      transaction.objectStore('draft').put(draft, 'resume');
+    });
+    saved = draft;
+    pendingVideos = [];
+    pendingTitles = [];
+    refreshFilmTitles();
+    applyText(draft.text);
+    setEditing(false);
+  } catch {
+    message.textContent = '保存失败，当前改动还在页面上。';
+  } finally {
+    save.disabled = cancel.disabled = upload.disabled = slot.disabled = titleInput.disabled = false;
+  }
+});
+video.addEventListener('error', () => {
+  if (!video.hasAttribute('src')) return;
+  placeholder.querySelector('p').textContent = '无法播放此视频。';
+  video.hidden = true;
+  placeholder.hidden = false;
+  status.textContent = '无法播放此视频，请在编辑模式中更换 MP4 文件。';
+});
+
+editButtons.forEach(button => button.disabled = true);
+selectFilm(0);
+const database = openDatabase();
+database.then(db => {
+  const request = db.transaction('draft').objectStore('draft').get('resume');
+  request.onsuccess = () => {
+    if (request.result) {
+      saved = request.result;
+      if (saved.resumeRevision === 2) applyText(saved.text);
+      selectFilm(activeFilm);
+    }
+    editButtons.forEach(button => button.disabled = false);
+  };
+  request.onerror = () => editButtons.forEach(button => button.disabled = false);
+}).catch(() => editButtons.forEach(button => button.disabled = false));
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
