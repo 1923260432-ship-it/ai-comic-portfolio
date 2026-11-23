@@ -250,10 +250,14 @@ let saved = {};
 let pendingVideos = []; let pendingTitles = []; let activeFilm = 0;
 let localUrl;
 
-const filmLibrary = ["软柿子","ep1(1)","ep1(2)","EP1（11 文件夹）","爆款月亮失约止于盛夏大码男孩西语","微信视频2026-11-22_204752_624","ep1 修改后 1019","ep1","星际EP1"].map((title,i) => ({title,src:i === 0 ? 'showreel.mp4' : 'films/film-' + (i+1) + '.mp4',poster:'films/still-' + (i+1) + '.jpg'}));
+const filmLibrary = ["软柿子","ep1(1)","ep1(2)","EP1（11 文件夹）","爆款月亮失约止于盛夏大码男孩西语","微信视频2026-11-22_204752_624","ep1 修改后 1019","ep1","星际EP1"].map((title,i) => ({title,originalSlot:i,src:i === 0 ? 'showreel.mp4' : 'films/film-' + (i+1) + '.mp4',poster:'films/still-' + (i+1) + '.jpg'}));
+filmLibrary.push(filmLibrary.shift());
+function inGalleryOrder(values = []) {
+  return filmLibrary.map(film => values[film.originalSlot]);
+}
 const filmButtons = [...document.querySelectorAll('[data-film]')];
 function filmAt(index) {
-  return index in pendingVideos ? pendingVideos[index] : saved.videos?.[index] || (index === 0 ? saved.video : undefined);
+  return index in pendingVideos ? pendingVideos[index] : saved.videos?.[index] || (filmLibrary[index].originalSlot === 0 ? saved.video : undefined);
 }
 function customTitle(index) {
   return pendingTitles[index] ?? saved.titles?.[index] ?? '';
@@ -523,7 +527,7 @@ input.addEventListener('change', () => {
   const slots = [uploadSlot];
   for (let step = 1; step < filmButtons.length; step++) {
     const next = (uploadSlot + step) % filmButtons.length;
-    if (next !== 0 && !filmAt(next)) slots.push(next);
+    if (filmLibrary[next].originalSlot !== 0 && !filmAt(next)) slots.push(next);
   }
   if (files.length > slots.length) {
     message.textContent = '可放入 ' + slots.length + ' 支影片，请减少本次选择的文件数量。';
@@ -548,7 +552,7 @@ function captureDraft() {
 document.querySelector('#backup-draft').addEventListener('click', () => {
   const {videos, ...draft} = captureDraft();
   const metadata = videos.map(file => file ? {name:file.name,type:file.type,size:file.size} : null);
-  const header = new TextEncoder().encode(JSON.stringify({...draft, metadata}) + '\n');
+  const header = new TextEncoder().encode(JSON.stringify({...draft, metadata, galleryOrder:2}) + '\n');
   const url = URL.createObjectURL(new Blob([header, ...videos.filter(Boolean)]));
   const link = document.createElement('a');
   link.href = url;
@@ -578,8 +582,8 @@ draftFile.addEventListener('change', async () => {
       return new File([blob], entry.name, {type:entry.type});
     });
     if (offset !== file.size) throw new Error('Invalid draft size');
-    pendingVideos = videos;
-    pendingTitles = data.titles;
+    pendingVideos = data.galleryOrder === 2 ? videos : inGalleryOrder(videos);
+    pendingTitles = data.galleryOrder === 2 ? data.titles : inGalleryOrder(data.titles);
     applyText(data.text);
     selectFilm(activeFilm);
     syncTitleInput();
@@ -616,11 +620,11 @@ function flushDraft() {
         tx.onabort = () => reject(tx.error);
         const store = tx.objectStore('draft');
         const {videos,...metadata} = draft;
-        store.put({...metadata, splitFiles:true}, 'resume');
+        store.put({...metadata, galleryOrder:2, splitFiles:true}, 'resume');
         videos.forEach((file,i) => {
           if (!migrateFiles && file === previousFiles[i]) return;
-          if (file) store.put(file,'film-'+i);
-          else store.delete('film-'+i);
+          if (file) store.put(file,'film-'+filmLibrary[i].originalSlot);
+          else store.delete('film-'+filmLibrary[i].originalSlot);
         });
       });
       previousFiles = draft.videos.slice();
@@ -673,19 +677,23 @@ video.addEventListener('error', () => {
 });
 
 editButtons.forEach(button => button.disabled = true);
-selectFilm(1);
-centerFilm(1, "instant");
+selectFilm(0);
+centerFilm(0, "instant");
 renderFramePosition();
 window.addEventListener('resize', renderFramePosition);
 const database = openDatabase();
 database.then(db => {
   const tx = db.transaction('draft');
   const store = tx.objectStore('draft');
-  const files = filmButtons.map((_,i) => store.get('film-'+i));
+  const files = filmButtons.map((_,i) => store.get('film-'+filmLibrary[i].originalSlot));
   const request = store.get('resume');
   tx.oncomplete = () => {
     if (request.result) {
       saved = request.result;
+      if (saved.galleryOrder !== 2) {
+        saved.titles = inGalleryOrder(saved.titles);
+        if (saved.videos) saved.videos = inGalleryOrder(saved.videos);
+      }
       if (saved.splitFiles) saved.videos = files.map(item => item.result);
       else migrateFiles = true;
       previousFiles = filmButtons.map((_,i) => filmAt(i));
