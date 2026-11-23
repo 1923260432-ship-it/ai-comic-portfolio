@@ -180,6 +180,41 @@ body:has(#screening[open]){overflow:hidden}
 .watch-film{align-self:center;justify-self:center;margin:6px auto 12px;padding:9px 20px;border:1px solid currentColor;border-radius:2px;background:transparent;color:var(--ink)}
 .watch-film:hover{background:var(--ink);color:var(--paper)}
 @media(max-width:650px){.screen-body{flex-direction:column}#screen-info{width:100%;max-height:38%;padding:12px 18px}#screen-info h2{font-size:20px;margin:0 0 8px}#screen-info dl{display:flex;gap:20px}#screen-info dl div{gap:8px;padding:4px 0}.screen-room .screen-tools button{padding:5px 9px}}
+/* The portfolio is bound into four paper spreads. */
+body.book-ready{--ink:#281f1c;--paper:#f5eddb;--accent:#b9412c;background-color:#b8aba0;background-image:var(--paper-grain),linear-gradient(125deg,#bfb5a7,#9c8c80)}
+.book-ready .top{position:relative;z-index:1;background:transparent;border:0;color:var(--ink)}
+.book-ready .bar{min-height:54px;border-bottom:1px solid #5c504849;width:min(1160px,92%);font-size:14px}
+.book-ready .bar>a{font:italic 24px Georgia,serif;color:var(--ink)}
+.book-ready .bar>a:after{content:" /  创作手账";font:13px system-ui;letter-spacing:.12em}
+.book-ready main.wrap{width:min(1160px,92%);padding:25px 0 32px}
+.book-tabs{display:flex;flex-wrap:nowrap;justify-content:flex-end;gap:4px;padding-inline:12px}
+.book-tabs a{font-size:14px;color:#302623;border:1px solid #72625384;border-bottom:none;text-decoration:none;padding:9px clamp(10px,2vw,27px);border-radius:8px 8px 0 0;background:#dfcbb1;transform:rotate(-1deg)}
+.book-tabs a:nth-child(2){background:#c4c9a8}.book-tabs a:nth-child(3){background:#c0cccd}.book-tabs a:nth-child(4){background:#dfbdae}
+.book-tabs a[aria-current=page]{background:#7f2e22;color:#fff7e3}
+.book-stack{isolation:isolate;position:relative;border:1px solid #796954;border-radius:4px 8px 5px 3px;background:#f5eddb;box-shadow:1px 3px #bcad95,2px 5px #e4d8c1,3px 7px #877968,4px 10px #64493d,4px 20px 36px #382c2438;perspective:1600px}
+.book-leaf{display:flow-root;position:relative;min-height:clamp(480px,65vh,740px);background-color:#f5eddb;background-image:var(--paper-grain),linear-gradient(90deg,transparent 47%,#71563810 49.3%,#66513d33 49.93%,#fcf6eb 50.1%,transparent 52%);border-radius:inherit;transform-origin:left center}
+.book-cover{display:grid;grid-template-columns:1fr 1fr}
+.book-cover .hero{position:relative;align-self:center;padding:clamp(25px,4.1vw,66px);min-width:0}
+.book-cover .name-en{display:block;width:min-content;margin:0 0 20px;color:#963424;font:italic 500 clamp(68px,8.5vw,132px)/.79 Georgia,'Times New Roman',serif;letter-spacing:-.09em}
+.book-cover .name{font-size:clamp(22px,2.8vw,46px);font-weight:700;color:var(--ink)}
+.book-cover .hero h1{font-size:clamp(18px,2vw,30px);margin:2px 0 16px;line-height:1.3;letter-spacing:.01em}
+.book-cover .hero-bottom p{color:#594f43;line-height:1.8;font-size:15px}
+.cover-photos{position:relative;align-self:center;aspect-ratio:1/.96;margin:24px 10% 24px 6%}
+.still-print{position:absolute;padding:6px 6px 18px;background:#fff9e9;border:1px solid #695b4b60;box-shadow:2px 5px 12px #34241848;cursor:pointer;transition:transform .25s;transform:rotate(var(--tilt));width:50%;height:74%}
+.still-print:first-child{--tilt:-10deg;left:2%;top:2%}.still-print:last-child{--tilt:8deg;right:2%;bottom:0}
+.still-print:after{content:"";position:absolute;top:-9px;left:27%;width:44%;height:19px;background:#dbc697b8;transform:rotate(-5deg);border-inline:2px dotted #f5e8cd80}
+.still-print img,.still-print video{width:100%;height:100%;display:block;object-fit:cover}
+.still-print:focus-visible,.still-print:hover{z-index:1;transform:translateY(-5px) rotate(0)}
+.book-ready .cinema-head{display:none}.book-leaf .catalog-title{font:italic clamp(46px,7vw,96px)/1 Georgia,serif;letter-spacing:-.06em;color:#322a21}.book-leaf .catalog-title em{color:#923827}
+.book-leaf .section{padding:clamp(24px,4vw,60px);border:0;grid-template-columns:minmax(100px,1fr) 2.6fr}
+.book-leaf .section h2{font-size:clamp(23px,3vw,43px);font-weight:650;line-height:1.15;color:#893a2a}
+.book-leaf .section article{padding-bottom:8px}.book-leaf .section+.section{border-top:1px dashed #ac9a80}
+.book-controls{display:flex;align-items:center;justify-content:space-between;padding:12px clamp(16px,3vw,46px);border-top:1px solid #8c765d66;background:#f1e7d3;background-image:var(--paper-grain);font:italic 15px Georgia,serif}
+.book-controls button{background:none;border:0;color:#403328;font:inherit;font-size:22px;min-width:44px;min-height:36px;cursor:pointer}.book-controls button:disabled{opacity:.24;cursor:default}
+.book-ready>footer{display:none}
+@media(max-width:650px){.book-ready .bar,.book-ready main.wrap{width:94%}.book-ready main.wrap{padding-top:16px}.book-tabs{justify-content:space-between;gap:2px;padding-inline:4px}.book-tabs a{text-align:center;flex:1;padding:8px 1px;font-size:13px}.book-cover{display:flex;flex-direction:column}.book-cover .hero{align-self:stretch;padding:25px 22px 8px}.book-cover .name-en{font-size:clamp(50px,14vw,86px);width:auto;margin-bottom:12px}.book-cover .hero-bottom p{font-size:14px}.cover-photos{width:min(75%,290px);height:210px;margin:11px auto 20px}.book-leaf{min-height:0;background-image:var(--paper-grain),linear-gradient(90deg,#c7b79e70,transparent 3%)}.book-leaf .section{grid-template-columns:1fr;padding:24px 19px}.book-ready .bar nav{gap:8px}.book-controls{padding:5px 14px}}
+@media(prefers-reduced-motion:reduce){.still-print{transition:none}}
+
 </style>
 </head>
 <body>
@@ -306,6 +341,7 @@ function refreshFilmTitles() {
     frames[index].firstElementChild.textContent = filmTitle(index);
   });
   status.textContent = filmTitle(activeFilm);
+  refreshBookPhotos();
 }
 function syncTitleInput() {
   const index = Number(slot.value);
@@ -511,6 +547,7 @@ function showVideo(file) {
   video.hidden = false;
   placeholder.hidden = true;
 
+  if (document.body.classList.contains('book-ready') && cinema.closest('[hidden]')) return;
   video.play().catch(error => {
     if (error.name === 'NotAllowedError' && document.body.classList.contains('editing')) message.textContent = '视频已选中，请点画面下方的播放按钮。';
   });
@@ -559,6 +596,7 @@ editButtons.forEach(button => button.addEventListener('click', () => {
   editStart = captureDraft();
   message.textContent = '';
   setEditing(true);
+  showBookPage(0,true);
   slot.value = String(activeFilm);
   syncTitleInput();
   document.querySelector('#home').scrollIntoView();
@@ -904,6 +942,130 @@ projection.addEventListener('keydown',event => {
     openScreening(activeFilm);
   }
 });
+// Keep the original editable elements and their saved field order.
+const notebook = document.querySelector('main');
+const coverText = notebook.querySelector('.hero');
+const historySection = notebook.querySelector('.work-history');
+const skillsSection = document.querySelector('#skills');
+const contactSection = document.querySelector('#contact');
+const educationSection = contactSection.previousElementSibling;
+const tabs = document.createElement('nav');
+tabs.className = 'book-tabs';
+tabs.setAttribute('aria-label','手账目录');
+const stack = document.createElement('div');
+stack.className = 'book-stack';
+const photos = document.createElement('div');
+photos.className = 'cover-photos';
+for (const index of [8,7]) {
+  const print = document.createElement('button');
+  print.type = 'button';
+  print.className = 'still-print';
+  print.dataset.printSlot = index;
+  print.setAttribute('aria-label','放映' + filmTitle(index));
+  const img = document.createElement('img');
+  img.src = filmLibrary[index].poster;
+  img.alt = '';
+  print.append(img);
+  print.onclick = () => {
+    goToBookPage(1);
+    selectFilm(index);
+    centerFilm(index,'instant');
+    openScreening(index);
+  };
+  photos.append(print);
+}
+const chapters = [
+  {name:'关于我',hash:'#home',items:[coverText,photos]},
+  {name:'作品放映',hash:'#projection',items:[cinema]},
+  {name:'工作经历',hash:'#experience',items:[historySection]},
+  {name:'个人资料',hash:'#skills',items:[skillsSection,educationSection,contactSection]}
+];
+notebook.prepend(tabs,stack);
+const leaves = chapters.map((chapter,i) => {
+  const link = document.createElement('a');
+  link.href = chapter.hash;
+  link.textContent = chapter.name;
+  link.onclick = event => {event.preventDefault();goToBookPage(i);};
+  tabs.append(link);
+  const leaf = document.createElement('div');
+  leaf.className = 'book-leaf' + (i === 0 ? ' book-cover' : '');
+  leaf.hidden = true;
+  leaf.setAttribute('role','region');
+  leaf.setAttribute('aria-label',chapter.name);
+  leaf.append(...chapter.items);
+  stack.append(leaf);
+  return leaf;
+});
+const turns = document.createElement('div');
+turns.className = 'book-controls';
+turns.innerHTML = '<button type="button" aria-label="上一页">←</button><span aria-live="polite"></span><button type="button" aria-label="下一页">→</button>';
+stack.append(turns);
+let bookPage = -1;
+function showBookPage(index, scroll = false) {
+  if(index < 0 || index >= chapters.length) return;
+  const previous = bookPage;
+  bookPage = index;
+  leaves.forEach((leaf,i) => {
+    leaf.hidden = i !== index;
+    if (i === index) tabs.children[i].setAttribute('aria-current','page');
+    else tabs.children[i].removeAttribute('aria-current');
+  });
+  turns.firstElementChild.disabled = index === 0;
+  turns.lastElementChild.disabled = index === chapters.length - 1;
+  turns.querySelector('span').textContent = '0' + (index + 1) + ' / 04';
+  if(previous !== -1 && previous !== index && !reduceMotion.matches) {
+    leaves[index].animate([{transform:'rotateY('+(index>previous?-10:10)+'deg)',opacity:.55},{transform:'rotateY(0deg)',opacity:1}],{duration:340,easing:'ease-out'});
+  }
+  if(index === 1) {
+    centerFilm(activeFilm,'instant');
+    renderFramePosition();
+    if (!screening.open) video.play().catch(()=>{});
+  } else video.pause();
+  if(scroll) tabs.scrollIntoView({block:'start',behavior:'instant'});
+}
+function goToBookPage(index) {
+  if (!chapters[index]) return;
+  if(location.hash !== chapters[index].hash) history.pushState(null,'',chapters[index].hash);
+  showBookPage(index,true);
+}
+function routeBook(scroll) {
+  const index = location.hash === '#contact' ? 3 : chapters.findIndex(chapter => chapter.hash === location.hash);
+  showBookPage(index < 0 ? 0 : index,scroll);
+  if(location.hash === '#contact') contactSection.scrollIntoView();
+}
+turns.firstElementChild.onclick = () => goToBookPage(bookPage-1);
+turns.lastElementChild.onclick = () => goToBookPage(bookPage+1);
+let bookTouch;
+stack.addEventListener('touchstart',event => {
+  bookTouch = !document.body.classList.contains('editing') && event.touches.length === 1 && !event.target.closest('.cinema,button,a,input,video,[contenteditable]') ? event.touches[0] : null;
+},{passive:true});
+stack.addEventListener('touchend',event => {
+  if(!bookTouch) return;
+  const dx=event.changedTouches[0].clientX-bookTouch.clientX;
+  const dy=event.changedTouches[0].clientY-bookTouch.clientY;
+  if(Math.abs(dx)>60 && Math.abs(dx)>2*Math.abs(dy)) goToBookPage(bookPage-Math.sign(dx));
+  bookTouch=null;
+},{passive:true});
+stack.addEventListener('touchcancel',()=>{bookTouch=null;},{passive:true});
+window.addEventListener('hashchange',()=>routeBook(true));
+function refreshBookPhotos() {
+  document.querySelectorAll('[data-print-slot]').forEach(print=>{
+    const index=Number(print.dataset.printSlot);
+    print.setAttribute('aria-label','放映' + filmTitle(index));
+    const file=filmAt(index);
+    if(print.bookFile===file) return;
+    print.bookFile=file;
+    const media=document.createElement(file?'video':'img');
+    if(file){
+      media.muted=true;media.playsInline=true;media.preload='metadata';
+      media.src=previews[index].source+'#t=0.3';
+    }else{media.src=filmLibrary[index].poster;media.alt='';}
+    print.replaceChildren(media);
+  });
+}
+document.body.classList.add('book-ready');
+routeBook(false);
+
 const grain = document.createElement('canvas');
 grain.width = grain.height = 128;
 const grainContext = grain.getContext('2d');
