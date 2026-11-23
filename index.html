@@ -162,6 +162,24 @@ body{background-color:var(--paper);background-image:var(--paper-grain)}
 body:has(#screening[open]){overflow:hidden}
 @media(max-width:650px){.cinema-head{min-height:55px}.catalog-caption{font-size:13px}.catalog-title{padding-top:28px}.projection,body:not(.editing) .projection{height:clamp(305px,55svh,550px)}.frame-track{--w:min(58vw,26svh)}.screen-tools{padding:11px 15px}}
 
+#screening[open]{display:block}
+.screen-room{height:100%;width:100%;display:grid;grid-template-rows:auto minmax(0,1fr) auto;position:relative;isolation:isolate;overflow:hidden;background:#11100f;color:#f6f2ec}
+.screen-room .screen-atmosphere{opacity:.14}
+.screen-room .screen-tools{gap:8px;padding:clamp(12px,2vh,24px) clamp(12px,3vw,48px);margin:0;background:transparent;color:inherit}
+.screen-room .screen-tools button,.watch-film{font:inherit;cursor:pointer}
+.screen-room .screen-tools button{font-size:14px;color:inherit;background:transparent;border:1px solid #625f59;border-radius:2px;min-height:40px}
+.screen-room .screen-tools button:hover,.screen-room .screen-tools button[aria-expanded=true]{background:#ede8da;color:#161613}
+.screen-actions{display:flex;gap:7px}
+.screen-body{display:flex;min-height:0;border-block:1px solid #49463e}
+.screen-stage{flex:1;min-width:0;overflow:hidden;background:#090909}
+.screen-stage video{width:100%;height:100%;object-fit:contain}
+#screen-info{box-sizing:border-box;overflow:auto;width:clamp(220px,26vw,390px);padding:clamp(18px,3vw,45px);background:#eae5d9;background-image:var(--paper-grain);color:#26241f}
+#screen-info h2{font-size:clamp(23px,3vw,44px);line-height:1.12;overflow-wrap:anywhere;margin:0 0 1em}
+#screen-info dl{margin:0}#screen-info dl div{display:flex;justify-content:space-between;gap:16px;border-top:1px solid #928e82;padding:10px 0}#screen-info dd{margin:0;font-variant-numeric:tabular-nums}
+#screen-count{font:14px ui-monospace,monospace;letter-spacing:.12em}
+.watch-film{align-self:center;justify-self:center;margin:6px auto 12px;padding:9px 20px;border:1px solid currentColor;border-radius:2px;background:transparent;color:var(--ink)}
+.watch-film:hover{background:var(--ink);color:var(--paper)}
+@media(max-width:650px){.screen-body{flex-direction:column}#screen-info{width:100%;max-height:38%;padding:12px 18px}#screen-info h2{font-size:20px;margin:0 0 8px}#screen-info dl{display:flex;gap:20px}#screen-info dl div{gap:8px;padding:4px 0}.screen-room .screen-tools button{padding:5px 9px}}
 </style>
 </head>
 <body>
@@ -180,6 +198,7 @@ body:has(#screening[open]){overflow:hidden}
   <button type="button" tabindex="-1" data-film="3" aria-pressed="false">04 · 待添加</button>
   <button type="button" tabindex="-1" data-film="4" aria-pressed="false">05 · 待添加</button><button type="button" tabindex="-1" data-film="5" aria-pressed="false">06 · 待添加</button><button type="button" tabindex="-1" data-film="6" aria-pressed="false">07 · 待添加</button><button type="button" tabindex="-1" data-film="7" aria-pressed="false">08 · 待添加</button><button type="button" tabindex="-1" data-film="8" aria-pressed="false">09 · 待添加</button>
 </nav>
+<button class="watch-film" id="watch-film" type="button">▷ 放映此片</button>
 <div class="cinema-foot"><input id="video-file" multiple type="file" accept="video/*,.mp4,.webm" hidden><p id="video-status" role="status">软柿子</p></div>
 </section>
 <header class="top"><div class="wrap bar"><a href="#home"><strong>姜澜</strong></a><nav aria-label="简历导航"><a href="#skills">技能</a><a href="#contact">联系</a></nav></div></header>
@@ -219,7 +238,29 @@ body:has(#screening[open]){overflow:hidden}
 </ul></article></div></section>
 <section class="section" id="contact"><h2>联系方式</h2><div class="entries"><p>邮箱　1923260432@qq.com</p></div></section>
 </main>
-<footer><div class="wrap">姜澜 · AI 漫剧作品集</div></footer><dialog id="screening" aria-label="影片放映厅"><div class="screen-atmosphere" aria-hidden="true"></div><div class="screen-tools"><span>姜澜 / 放映厅</span><button type="button" id="leave-screen" autofocus>退出放映</button></div><div class="screen-stage"><video controls playsinline loop preload="none" aria-label="影片正片"></video></div><div class="screen-tools"><button type="button" id="prev-screen">上一支</button><span id="screen-count" aria-live="polite"></span><button type="button" id="next-screen">下一支</button></div></dialog>
+<footer><div class="wrap">姜澜 · AI 漫剧作品集</div></footer><dialog id="screening" aria-label="影片放映厅">
+<div class="screen-room">
+  <div class="screen-atmosphere" aria-hidden="true"></div>
+  <header class="screen-tools">
+    <button type="button" id="leave-screen" autofocus>← 返回选片</button>
+    <div class="screen-actions">
+      <button type="button" id="screen-info-toggle" aria-controls="screen-info" aria-expanded="false">影片信息</button>
+      <button type="button" id="screen-full">全屏</button>
+    </div>
+  </header>
+  <div class="screen-body">
+    <div class="screen-stage"><video controls playsinline preload="none" aria-label="影片正片"></video></div>
+    <aside id="screen-info" hidden aria-label="影片信息">
+      <h2 id="screen-title"></h2>
+      <dl><div><dt>片长</dt><dd id="screen-duration">—</dd></div><div><dt>画幅</dt><dd id="screen-format">—</dd></div></dl>
+    </aside>
+  </div>
+  <footer class="screen-tools screen-nav">
+    <button type="button" id="prev-screen">← 上一支</button>
+    <span id="screen-count" aria-live="polite"></span>
+    <button type="button" id="next-screen">下一支 →</button>
+  </footer>
+</div></dialog>
 <script>
 const video = document.querySelector('#showreel');
 const input = document.querySelector('#video-file');
@@ -771,8 +812,29 @@ const theatreVideo = screening.querySelector('video');
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
 let theatreIndex = 0;
 let theatreUrl;
-let launchPosition = 0;
-let launchFilm = 0;
+const room = screening.querySelector('.screen-room');
+const info = document.querySelector('#screen-info');
+const infoToggle = document.querySelector('#screen-info-toggle');
+const fullButton = document.querySelector('#screen-full');
+function setInfo(open) {
+  info.hidden = !open;
+  infoToggle.setAttribute('aria-expanded', String(open));
+}
+infoToggle.onclick = () => setInfo(info.hidden);
+fullButton.hidden = !(document.fullscreenEnabled && room.requestFullscreen) && !theatreVideo.webkitEnterFullscreen;
+fullButton.onclick = async () => {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else if (document.fullscreenEnabled && room.requestFullscreen) await room.requestFullscreen();
+    else theatreVideo.webkitEnterFullscreen();
+  } catch {
+    if (theatreVideo.webkitSupportsFullscreen) theatreVideo.webkitEnterFullscreen();
+  }
+};
+document.addEventListener('fullscreenchange', () => {
+  fullButton.textContent = document.fullscreenElement ? '退出全屏' : '全屏';
+});
+document.querySelector('#watch-film').onclick = () => openScreening(activeFilm);
 
 function projectInTheatre(index, startAt = 0) {
   theatreIndex = (index + frames.length) % frames.length;
@@ -781,7 +843,16 @@ function projectInTheatre(index, startAt = 0) {
   theatreUrl = file ? URL.createObjectURL(file) : undefined;
   const entry = filmLibrary[theatreIndex];
   theatreVideo.poster = file ? '' : entry.poster;
-  theatreVideo.onloadedmetadata = () => {if (startAt && startAt < theatreVideo.duration) theatreVideo.currentTime = startAt;};
+  document.querySelector('#screen-title').textContent = filmTitle(theatreIndex);
+  const duration = document.querySelector('#screen-duration');
+  const format = document.querySelector('#screen-format');
+  duration.textContent = format.textContent = '—';
+  theatreVideo.onloadedmetadata = () => {
+    const seconds = Math.floor(theatreVideo.duration);
+    if (Number.isFinite(seconds)) duration.textContent = Math.floor(seconds / 60) + ':' + String(seconds % 60).padStart(2, '0');
+    format.textContent = theatreVideo.videoWidth + ' × ' + theatreVideo.videoHeight;
+    if (startAt && startAt < theatreVideo.duration) theatreVideo.currentTime = startAt;
+  };
   theatreVideo.src = theatreUrl || entry.src;
   screening.querySelector('.screen-atmosphere').style.backgroundImage = file ? 'none' : 'url("' + entry.poster + '")';
   document.querySelector('#screen-count').textContent = String(theatreIndex+1).padStart(2,'0') + ' / ' + String(frames.length).padStart(2,'0');
@@ -789,22 +860,23 @@ function projectInTheatre(index, startAt = 0) {
 }
 function openScreening(index) {
   if (index < 0 || screening.open) return;
-  launchPosition = filmStrip.scrollLeft;
-  launchFilm = activeFilm;
+  setInfo(false);
   cancelAnimationFrame(hoverFrame);
   hoverFrame = hoverTarget = undefined;
   clearTimeout(settleTimer);
   const rect = frames[index].getBoundingClientRect();
-  const time = index === activeFilm ? video.currentTime : 0;
   video.pause();
   screening.showModal();
-  projectInTheatre(index,time);
+  projectInTheatre(index);
   if (!reduceMotion.matches) {
     const vw = innerWidth, vh = screening.clientHeight;
     screening.animate([{clipPath:'inset('+Math.max(0,rect.top)+'px '+Math.max(0,vw-rect.right)+'px '+Math.max(0,vh-rect.bottom)+'px '+Math.max(0,rect.left)+'px)'},{clipPath:'inset(0)'}],{duration:440,easing:'cubic-bezier(.18,.8,.22,1)'});
   }
 }
-document.querySelector('#leave-screen').onclick = () => screening.close();
+document.querySelector('#leave-screen').onclick = async () => {
+  if (document.fullscreenElement) await document.exitFullscreen().catch(() => {});
+  screening.close();
+};
 document.querySelector('#prev-screen').onclick = () => projectInTheatre(theatreIndex-1);
 document.querySelector('#next-screen').onclick = () => projectInTheatre(theatreIndex+1);
 screening.addEventListener('keydown',event => {
@@ -820,8 +892,9 @@ screening.addEventListener('close',() => {
   theatreVideo.load();
   if(theatreUrl) URL.revokeObjectURL(theatreUrl);
   theatreUrl=undefined;
-  filmStrip.scrollTo({left:launchPosition,behavior:'instant'});
-  selectFilm(launchFilm);
+  wheelTarget = theatreIndex;
+  selectFilm(theatreIndex);
+  centerFilm(theatreIndex, 'instant');
   video.play().catch(()=>{});
   projection.focus({preventScroll:true});
 });
