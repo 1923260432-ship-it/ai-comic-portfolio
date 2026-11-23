@@ -193,12 +193,6 @@ body:has(#screening[open]){overflow:hidden}
 <p>通过全国计算机二级考试，熟练使用 Office 等办公软件。持 C2 驾照。</p>
 </div></section>
 <section class="section work-history"><h2>工作经历</h2><div class="entries">
-<article><h3>漫剧制作</h3><dl class="work-details">
-<div><dt>任职时间与团队</dt><dd data-work-field data-placeholder="点击填写"></dd></div>
-<div><dt>主要职责</dt><dd data-work-field data-placeholder="点击填写"></dd></div>
-<div><dt>参与项目</dt><dd data-work-field data-placeholder="点击填写"></dd></div>
-<div><dt>交付成果</dt><dd data-work-field data-placeholder="点击填写"></dd></div>
-</dl></article>
 <article><h3>浙江大丰文化有限公司 · 亚运会博物馆运营</h3><p class="muted">2025.02 起（旧简历记为至今）</p><ul>
 <li>负责政务、研学及旅行团讲解与引导，日均讲解 2–3 场，累计服务超过 5,000 人次，接待零投诉。</li>
 <li>协助文创商店销售、陈列、收银及库存管理，日均协助完成销售额 2,000 元。</li>
@@ -490,6 +484,18 @@ function openDatabase() {
   });
 }
 
+function currentDraftText(draft) {
+  if (!Array.isArray(draft.text)) return;
+  if (draft.resumeRevision === 4) return draft.text;
+  if (![2, 3].includes(draft.resumeRevision)) return;
+  const values = draft.text.slice();
+  if (draft.resumeRevision === 2) values.splice(3, 3);
+  // Legacy drafts stored the first employer before Dafeng and its four detail fields at the end.
+  const firstEmployer = fields.indexOf(document.querySelector('.work-history article h3'));
+  values.splice(firstEmployer, 1);
+  return values.slice(0, fields.length);
+}
+
 function applyText(values) {
   if (!values) return;
   fields.forEach((field, index) => {
@@ -547,7 +553,7 @@ input.addEventListener('change', () => {
   input.value = '';
 });
 function captureDraft() {
-  return {resumeRevision: 3, text: fields.map(field => field.textContent), videos: filmButtons.map((_, index) => filmAt(index)), titles: filmButtons.map((_, index) => customTitle(index).trim())};
+  return {resumeRevision: 4, text: fields.map(field => field.textContent), videos: filmButtons.map((_, index) => filmAt(index)), titles: filmButtons.map((_, index) => customTitle(index).trim())};
 }
 document.querySelector('#backup-draft').addEventListener('click', () => {
   const {videos, ...draft} = captureDraft();
@@ -572,7 +578,7 @@ draftFile.addEventListener('change', async () => {
     const end = header.indexOf(10);
     if (end < 0) throw new Error('Missing header');
     const data = JSON.parse(new TextDecoder().decode(header.slice(0, end)));
-    if (data.resumeRevision !== 3 || !Array.isArray(data.text) || !Array.isArray(data.titles) || !Array.isArray(data.metadata) || (data.metadata.length < 1 || data.metadata.length > filmButtons.length)) throw new Error('Invalid draft');
+    if (![3, 4].includes(data.resumeRevision) || !Array.isArray(data.text) || !Array.isArray(data.titles) || !Array.isArray(data.metadata) || (data.metadata.length < 1 || data.metadata.length > filmButtons.length)) throw new Error('Invalid draft');
     let offset = end + 1;
     const videos = data.metadata.map(entry => {
       if (entry === null) return undefined;
@@ -584,7 +590,7 @@ draftFile.addEventListener('change', async () => {
     if (offset !== file.size) throw new Error('Invalid draft size');
     pendingVideos = data.galleryOrder === 2 ? videos : inGalleryOrder(videos);
     pendingTitles = data.galleryOrder === 2 ? data.titles : inGalleryOrder(data.titles);
-    applyText(data.text);
+    applyText(currentDraftText(data));
     selectFilm(activeFilm);
     syncTitleInput();
     markChanged();
@@ -697,10 +703,11 @@ database.then(db => {
       if (saved.splitFiles) saved.videos = files.map(item => item.result);
       else migrateFiles = true;
       previousFiles = filmButtons.map((_,i) => filmAt(i));
-      if (saved.resumeRevision === 2 && Array.isArray(saved.text)) {
-        saved = {...saved, resumeRevision: 3, text: [...saved.text.slice(0, 3), ...saved.text.slice(6)]};
+      const text = currentDraftText(saved);
+      if (text) {
+        saved = {...saved, resumeRevision: 4, text};
+        applyText(text);
       }
-      if (saved.resumeRevision === 3) applyText(saved.text);
       selectFilm(activeFilm);
     }
     editButtons.forEach(button => button.disabled = false);
