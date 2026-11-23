@@ -215,6 +215,28 @@ body.book-ready{--ink:#281f1c;--paper:#f5eddb;--accent:#b9412c;background-color:
 @media(max-width:650px){.book-ready .bar,.book-ready main.wrap{width:94%}.book-ready main.wrap{padding-top:16px}.book-tabs{justify-content:space-between;gap:2px;padding-inline:4px}.book-tabs a{text-align:center;flex:1;padding:8px 1px;font-size:13px}.book-cover{display:flex;flex-direction:column}.book-cover .hero{align-self:stretch;padding:25px 22px 8px}.book-cover .name-en{font-size:clamp(50px,14vw,86px);width:auto;margin-bottom:12px}.book-cover .hero-bottom p{font-size:14px}.cover-photos{width:min(75%,290px);height:210px;margin:11px auto 20px}.book-leaf{min-height:0;background-image:var(--paper-grain),linear-gradient(90deg,#c7b79e70,transparent 3%)}.book-leaf .section{grid-template-columns:1fr;padding:24px 19px}.book-ready .bar nav{gap:8px}.book-controls{padding:5px 14px}}
 @media(prefers-reduced-motion:reduce){.still-print{transition:none}}
 
+
+/* Only the temporary sheet is composited while a page is turning. */
+.book-stack{perspective:none}
+.book-leaf{touch-action:pan-y}
+.turn-stage{position:absolute;top:0;left:0;width:100%;z-index:5;pointer-events:none;perspective:2200px;overflow:clip}
+.turn-mask,.turn-sheet,.turn-face{position:absolute;inset-block:0;width:50%}
+.turn-mask,.turn-face{overflow:hidden;background-color:#f5eddb;background-image:var(--paper-grain)}
+.turn-sheet{left:50%;transform-origin:left center;transform-style:preserve-3d;will-change:transform}
+.turn-mask{left:0}.turn-face{inset:0;width:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.turn-face.back{transform:rotateY(180deg)}
+.turn-face:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#69503c45,transparent 15%,transparent 86%,#a08b6a26);pointer-events:none}
+.turn-copy{position:absolute;top:0;width:200%;margin:0;pointer-events:none}
+.turn-copy.right{right:0}.turn-copy.left{left:0}
+.turn-stage.reverse .turn-sheet{left:0;transform-origin:right center}.turn-stage.reverse .turn-mask{left:50%}
+.turn-copy .film-frame img{width:100%;height:100%;object-fit:contain}
+@media(max-width:650px){
+  .turn-stage{perspective:1150px}.turn-stage .turn-sheet,.turn-stage.reverse .turn-sheet{left:0;width:100%;transform-origin:left center}
+  .turn-mask{display:none}.turn-copy{width:100%}.turn-face.back{background-color:#e9dfc8;background-image:var(--paper-grain)}
+}
+
+@media(max-width:650px){.turn-stage.reverse .turn-mask{display:block;left:0;width:100%}}
+
 </style>
 </head>
 <body>
@@ -353,6 +375,9 @@ titleInput.addEventListener('input', () => {
   pendingTitles[Number(slot.value)] = titleInput.value;
   refreshFilmTitles();
 });
+function posterOnly() {
+  return !document.body.classList.contains('editing') && (matchMedia('(hover:none), (pointer:coarse), (max-width:650px)').matches || navigator.connection?.saveData);
+}
 function selectFilm(index) {
   activeFilm = index;
   updatePreviews();
@@ -362,6 +387,12 @@ function selectFilm(index) {
   });
   refreshFilmTitles();
   const file = filmAt(index);
+  if (!document.body.classList.contains('book-ready') || cinema.closest('[hidden]') || posterOnly()) {
+    video.pause();
+    video.hidden = true;
+    placeholder.hidden = true;
+    return;
+  }
   if (file || filmLibrary[index]) {
     showVideo(file);
     return;
@@ -395,7 +426,7 @@ const previews = frames.map(frame => {
   element.className = 'film-preview';
   element.muted = true;
   element.playsInline = true;
-  element.preload = 'auto';
+  element.preload = 'metadata';
   element.hidden = true;
   frame.append(element);
   return {element, file: undefined, source: ''};
@@ -409,8 +440,9 @@ function updatePreviews() {
       preview.source = file ? URL.createObjectURL(file) : '';
     }
     const source = preview.source;
+    if (!document.body.classList.contains('book-ready') || cinema.closest('[hidden]')) return;
     preview.element.poster = file ? '' : filmLibrary[index].poster;
-    preview.element.hidden = index === activeFilm;
+    preview.element.hidden = index === activeFilm && !posterOnly();
     const previewSource = source ? source + '#t=0.3' : '';
     if (previewSource && preview.element.getAttribute('src') !== previewSource) preview.element.src = previewSource;
     if (!source) preview.element.removeAttribute('src');
@@ -933,7 +965,7 @@ screening.addEventListener('close',() => {
   wheelTarget = theatreIndex;
   selectFilm(theatreIndex);
   centerFilm(theatreIndex, 'instant');
-  video.play().catch(()=>{});
+  if(!posterOnly()) video.play().catch(()=>{});
   projection.focus({preventScroll:true});
 });
 projection.addEventListener('keydown',event => {
@@ -1001,9 +1033,87 @@ turns.className = 'book-controls';
 turns.innerHTML = '<button type="button" aria-label="上一页">←</button><span aria-live="polite"></span><button type="button" aria-label="下一页">→</button>';
 stack.append(turns);
 let bookPage = -1;
+let turning;
+function paperCopy(node) {
+  if (node.nodeType !== Node.ELEMENT_NODE) return node.cloneNode(false);
+  if (node.tagName === 'VIDEO') {
+    const still = document.createElement('img');
+    const slotIndex = frames.indexOf(node.closest('.film-frame'));
+    const poster = node.poster || (slotIndex >= 0 && !filmAt(slotIndex) ? filmLibrary[slotIndex].poster : '');
+    if (poster) still.src = poster;
+    still.alt = '';
+    still.hidden = node.classList.contains('film-preview') && poster ? false : node.hidden;
+    return still;
+  }
+  const copy = node.cloneNode(false);
+  copy.removeAttribute('id');
+  copy.removeAttribute('contenteditable');
+  copy.removeAttribute('data-print-slot');
+  for (const child of node.childNodes) copy.append(paperCopy(child));
+  return copy;
+}
+function closeTurn() {
+  if (!turning) return;
+  turning.motion.onfinish = null;
+  turning.motion.cancel();
+  turning.stage.remove();
+  leaves.forEach((leaf,i) => leaf.hidden = i !== bookPage);
+  turning = null;
+}
+function buildTurn(from,to) {
+  closeTurn();
+  const mobile = matchMedia('(max-width:650px)').matches;
+  const forward = to > from;
+  const stage = document.createElement('div');
+  stage.className = 'turn-stage' + (forward ? '' : ' reverse');
+  stage.setAttribute('aria-hidden','true');
+  stage.inert = true;
+  const outgoingHeight = leaves[from].offsetHeight;
+  leaves[from].hidden = true;
+  leaves[to].hidden = false;
+  const incomingHeight = leaves[to].offsetHeight;
+  stage.style.height = Math.min(Math.max(outgoingHeight,incomingHeight),Math.max(innerHeight,900)) + 'px';
+  const sheet = document.createElement('div');
+  sheet.className = 'turn-sheet';
+  const face = (parent,cls,index,side) => {
+    const holder = document.createElement('div');
+    holder.className = cls;
+    if(index !== null) {
+      const print = paperCopy(leaves[index]);
+      print.hidden = false;
+      print.style.height = (index===from ? outgoingHeight : incomingHeight)+'px';
+      print.classList.add('turn-copy',side);
+      holder.append(print);
+    }
+    parent.append(holder);
+  };
+  if(!mobile || !forward) face(stage,'turn-mask',from,forward?'left':'right');
+  face(sheet,'turn-face front',mobile && !forward ? to : from,forward?'right':'left');
+  face(sheet,'turn-face back',mobile?null:to,forward?'left':'right');
+  stage.append(sheet);
+  stack.append(stage);
+  const start = mobile && !forward ? -180 : 0;
+  const end = mobile && !forward ? 0 : forward ? -180 : 180;
+  const duration = mobile ? 620 : 820;
+  const motion = sheet.animate([{transform:'rotateY('+start+'deg)'},{transform:'rotateY('+end+'deg)'}],{duration,fill:'both',easing:'linear'});
+  motion.pause();
+  motion.currentTime=0;
+  turning={stage,motion,duration,from,to};
+  return turning;
+}
+function settleTurn(flip,commit) {
+  flip.motion.updatePlaybackRate(commit?1:-1);
+  flip.motion.onfinish = () => {if(turning===flip)closeTurn();};
+  flip.motion.play();
+}
+
 function showBookPage(index, scroll = false) {
   if(index < 0 || index >= chapters.length) return;
   const previous = bookPage;
+  let flip;
+  if(previous >= 0 && index !== previous && !reduceMotion.matches) {
+    flip = turning?.from===previous && turning.to===index ? turning : buildTurn(previous,index);
+  } else closeTurn();
   bookPage = index;
   leaves.forEach((leaf,i) => {
     leaf.hidden = i !== index;
@@ -1013,13 +1123,12 @@ function showBookPage(index, scroll = false) {
   turns.firstElementChild.disabled = index === 0;
   turns.lastElementChild.disabled = index === chapters.length - 1;
   turns.querySelector('span').textContent = '0' + (index + 1) + ' / 04';
-  if(previous !== -1 && previous !== index && !reduceMotion.matches) {
-    leaves[index].animate([{transform:'rotateY('+(index>previous?-10:10)+'deg)',opacity:.55},{transform:'rotateY(0deg)',opacity:1}],{duration:340,easing:'ease-out'});
-  }
+  if(flip)settleTurn(flip,true);
   if(index === 1) {
+    selectFilm(activeFilm);
     centerFilm(activeFilm,'instant');
     renderFramePosition();
-    if (!screening.open) video.play().catch(()=>{});
+    if (!screening.open && !posterOnly()) video.play().catch(()=>{});
   } else video.pause();
   if(scroll) tabs.scrollIntoView({block:'start',behavior:'instant'});
 }
@@ -1035,18 +1144,43 @@ function routeBook(scroll) {
 }
 turns.firstElementChild.onclick = () => goToBookPage(bookPage-1);
 turns.lastElementChild.onclick = () => goToBookPage(bookPage+1);
-let bookTouch;
-stack.addEventListener('touchstart',event => {
-  bookTouch = !document.body.classList.contains('editing') && event.touches.length === 1 && !event.target.closest('.cinema,button,a,input,video,[contenteditable]') ? event.touches[0] : null;
-},{passive:true});
-stack.addEventListener('touchend',event => {
-  if(!bookTouch) return;
-  const dx=event.changedTouches[0].clientX-bookTouch.clientX;
-  const dy=event.changedTouches[0].clientY-bookTouch.clientY;
-  if(Math.abs(dx)>60 && Math.abs(dx)>2*Math.abs(dy)) goToBookPage(bookPage-Math.sign(dx));
-  bookTouch=null;
-},{passive:true});
-stack.addEventListener('touchcancel',()=>{bookTouch=null;},{passive:true});
+let paperDrag;
+stack.addEventListener('pointerdown',event => {
+  if (!event.isPrimary || event.button !== 0 || document.body.classList.contains('editing') ||
+      event.target.closest('.projection,.film-strip,button:not(.still-print),a,input,video:not(.still-print video),[contenteditable]')) return;
+  paperDrag={id:event.pointerId,x:event.clientX,y:event.clientY,flip:null};
+});
+stack.addEventListener('pointermove',event => {
+  if (!paperDrag || event.pointerId!==paperDrag.id) return;
+  const dx=event.clientX-paperDrag.x, dy=event.clientY-paperDrag.y;
+  if (!paperDrag.flip) {
+    if(Math.abs(dy)>12 && Math.abs(dy)>Math.abs(dx)){paperDrag=null;return;}
+    if(Math.abs(dx)<10 || Math.abs(dx)<1.4*Math.abs(dy))return;
+    const to=bookPage-Math.sign(dx);
+    if(!chapters[to])return;
+    paperDrag.to=to;
+    stack.setPointerCapture(event.pointerId);
+    if(!reduceMotion.matches)paperDrag.flip=buildTurn(bookPage,to);
+  }
+  const flip=paperDrag.flip;
+  if(flip)flip.motion.currentTime=flip.duration*Math.min(.99,Math.max(0,-dx*Math.sign(flip.to-flip.from)/(stack.clientWidth*.7)));
+});
+function releasePaper(event) {
+  if(!paperDrag || event.pointerId!==paperDrag.id)return;
+  const {x,to,flip}=paperDrag;
+  paperDrag=null;
+  const dx=event.clientX-x;
+  if(event.type==='pointerup' && to!==undefined && -dx*Math.sign(to-bookPage)>Math.min(55,stack.clientWidth*.13))goToBookPage(to);
+  else if(flip && turning===flip)settleTurn(flip,false);
+}
+stack.addEventListener('pointerup',releasePaper);
+stack.addEventListener('pointercancel',releasePaper);
+stack.addEventListener('lostpointercapture',event => {
+  if(event.target===stack)releasePaper(event);
+});
+stack.addEventListener('pointerleave',event=>{
+  if(paperDrag && !stack.hasPointerCapture(event.pointerId))paperDrag=null;
+});
 window.addEventListener('hashchange',()=>routeBook(true));
 function refreshBookPhotos() {
   document.querySelectorAll('[data-print-slot]').forEach(print=>{
