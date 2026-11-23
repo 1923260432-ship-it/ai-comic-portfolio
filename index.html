@@ -319,6 +319,67 @@ body.book-ready{--cobalt:#244f9a;--red-ink:#bb2c25;--paper:#fbf8f0;--ink:#332c26
 @media(max-width:650px){.book-ready .bar{width:93%;min-height:60px}.book-ready .bar>a{font-size:23px}.book-ready main.wrap{width:94%;padding:8px 9px 8px 13px;margin:6px auto 34px}.book-cover{padding:20px 12px 14px;grid-template-rows:auto auto 1fr}.book-leaf{min-height:min(64svh,600px);height:auto;overflow:visible}.book-cover .cover-photos{width:91%;height:clamp(128px,21vh,180px)}.tv-link{grid-area:3/2/4/3;width:90%;padding-bottom:9%}.tv-glass{border-width:3px}.tv-case{border-width:2px}.tv-dial{border-width:1px}.binder-spine{width:5px}.ring-set i{width:14px;height:6px}.book-controls{position:relative;min-height:40px;display:flex;align-items:center;justify-content:space-between}.book-controls button,.book-controls button:first-child,.book-controls button:last-child{position:relative;inset:auto;width:44px;height:32px;min-height:32px;margin:0 8px;transform:none;font-size:21px}.book-controls span{inset:auto;left:50%;transform:translateX(-50%)}.binder-spine{height:calc(100% - 40px)}}
 .ring-set i{border-radius:48% 52% 47% 53% / 82% 82% 42% 40%;box-shadow:0 2px 2px #473e314a,inset 0 1px 1px #fffc}
 @media(min-width:651px){.book-ready main.wrap{background-size:95px 95px,auto}.book-controls button{background-size:95px 95px,auto}.book-ready .bar .disc-play{width:clamp(44px,5.5vw,71px);height:clamp(44px,5.5vw,71px)}}
+
+/* The photographed open binder is shared by every spread, including during a turn. */
+body.book-ready{--sheet:#ece1ca;background-color:#faf8ef;background-image:linear-gradient(#8074540a 1px,transparent 1px),linear-gradient(90deg,#8074540a 1px,transparent 1px);background-size:11px 11px}
+.book-ready main.wrap{--binder:url("art/organizer.webp");width:min(97%,1550px);height:clamp(480px,min(53vw,79svh),860px);margin:0 auto 18px;padding:0;border:0;border-radius:0;box-shadow:none;background:var(--binder) center / 100% 100% no-repeat}
+.book-ready main.wrap:before,.book-ready main.wrap:after,.binder-spine{display:none}
+.book-ready main.wrap:has(.turn-stage):after{content:"";display:block;position:absolute;inset:0;width:auto;height:auto;z-index:7;background:var(--binder) center / 100% 100% no-repeat;border:0;border-radius:0;box-shadow:none;transform:none;pointer-events:none;
+mask-image:linear-gradient(90deg,transparent 46.35%,black 46.6% 50.8%,transparent 51%),radial-gradient(ellipse 5.2% 1.8% at 48.6% 15%,black 88%,transparent),radial-gradient(ellipse 5.2% 1.8% at 48.6% 25%,black 88%,transparent),radial-gradient(ellipse 5.2% 1.8% at 48.6% 35%,black 88%,transparent),radial-gradient(ellipse 5.2% 1.8% at 48.6% 62.2%,black 88%,transparent),radial-gradient(ellipse 5.2% 1.8% at 48.6% 72.6%,black 88%,transparent),radial-gradient(ellipse 5.2% 1.8% at 48.6% 83%,black 88%,transparent)}
+.book-stack{position:absolute;inset:4.6% 10.1% 6% 7.3%;border:0;border-radius:0;box-shadow:none;background:transparent}
+.book-leaf{height:100%;min-height:0;box-sizing:border-box;overflow:auto;overscroll-behavior:contain;border-radius:0;background:transparent;scrollbar-width:thin}
+.book-cover{overflow:hidden;padding:3% 0 2%;grid-template-rows:.92fr 1.08fr}
+.book-cover .cover-photos{height:min(30vh,245px);width:66%}.book-cover .cover-photos .still-print{background:#e8e6da;padding:5px 5px 21px}
+.book-cover .hero h1{color:#be1f28;font-weight:900;letter-spacing:-.055em;line-height:1.03}
+.book-cover .hero-bottom p{font-size:clamp(15px,1.35vw,21px);line-height:1.65}
+.tv-link{position:relative;display:block;align-self:center;justify-self:center;width:min(77%,365px);height:auto;aspect-ratio:460/346;transform:rotate(0);padding:0;background:transparent}
+.tv-artwork{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.tv-window{position:absolute;inset:11.1% 27.6% 26% 11%;border-radius:16% / 23%;overflow:hidden;background:#29251e;box-shadow:inset 0 0 7px #30251a}
+.tv-window img{width:100%;height:100%;object-fit:cover;object-position:50% 32%;transition:transform .35s;filter:saturate(.84) contrast(.96)}
+.tv-window:after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,#fff3,transparent 43%,#36231528);box-shadow:inset 0 0 9px 1px #44382b90}
+.tv-link:hover .tv-window img,.tv-link:focus-visible .tv-window img{transform:scale(1.04)}
+.turn-stage .turn-face,.turn-stage .turn-mask{background:linear-gradient(90deg,#e4d7bf,#f0e5d0 13%,#eee2cd 86%,#e7d9c2)}
+.turn-stage .turn-face:after{background:linear-gradient(90deg,rgba(81,55,25,var(--ink-shadow,.08)),transparent 32%,transparent 83%,#a9926630)}
+.book-controls button,.book-controls button:last-child,.book-controls button:first-child{top:47.5%;height:44px;width:8.3%;background:transparent;border:0;box-shadow:none;color:#aa2420;transform:rotate(-6deg);font:900 clamp(34px,3.7vw,62px)/.8 'Segoe Print',Georgia,serif;text-shadow:0 1px #fbeebc}
+.book-controls button:after{display:none}.book-controls button:last-child{left:100.2%}.book-controls button:first-child{right:100.2%}.book-controls span{bottom:6px;right:1.7%}
+.book-ready .bar{width:min(85%,1300px);min-height:clamp(70px,12vh,115px)}
+.book-ready .bar>a .wordmark,.bar .book-tabs a,.bar .book-tabs a[aria-current=page]{font-family:'Arial Black','Trebuchet MS',sans-serif;font-weight:950;color:#214b9b;letter-spacing:-.065em}
+.ink-letter{display:inline-block;transform:translateY(var(--dy)) rotate(var(--a)) scaleY(var(--sy));transform-origin:50% 75%}
+.bar .book-tabs a[aria-current=page]:after{background:#24539a;height:2px}
+@media(max-width:650px){
+ .book-ready .bar{width:94%;min-height:62px}.book-ready main.wrap{width:98%;height:clamp(440px,76svh,780px);background-size:195% 100%;background-position:right center}
+ .book-ready main.wrap:has(.turn-stage):after{display:none}.book-stack{inset:4.5% 17.5% 6.2% 3.6%}
+ .book-cover{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto minmax(0,1fr);padding:8% 4% 11%;row-gap:12px;text-align:center}
+ .book-cover .hero h1{font-size:clamp(27px,8vw,38px)}.book-cover .hero-bottom{padding:0 4%}.book-cover .hero-bottom p{font-size:14px;line-height:1.55}
+ .book-cover .cover-photos{height:clamp(100px,17vh,160px);width:94%}.book-cover .cover-photos .still-print{padding:3px 3px 10px}
+ .tv-link{width:100%;grid-area:3/2/4/3}
+ .book-controls{position:absolute;inset:0;background:none;min-height:0}.book-controls span{top:auto;bottom:5px;left:auto;right:3%;transform:none}
+ .book-controls button:last-child{position:absolute;left:100%;right:auto;width:19%;margin:0}.book-controls button:first-child{position:absolute;inset:auto auto 0 3px;margin:0;width:42px;height:32px;font-size:29px}
+ .book-leaf{padding-bottom:28px}.book-cover{padding-bottom:10%}.book-leaf .section{padding:20px 0}.book-leaf .section h2,.book-leaf .section .entries{padding-inline:6%}
+ .book-leaf .study-notes{margin:0 4%}.book-leaf .catalog-title{margin-inline:4%;font-size:38px}.book-leaf .catalog-caption{margin-inline:4%;font-size:12px}
+ body.book-ready .book-leaf .projection{height:clamp(225px,35svh,340px)}
+}
+@media(prefers-reduced-motion:reduce){.tv-window img{transition:none}}
+
+@property --page-bend{syntax:"<angle>";inherits:true;initial-value:0deg}
+.turn-wing{position:absolute;inset:0;transform-style:preserve-3d;pointer-events:none}
+.turn-wing.outer{transform-origin:55% center;transform:rotateY(var(--page-bend))}
+.turn-wing.inner .front,.turn-wing.outer .back{clip-path:inset(0 44.8% 0 0)}
+.turn-wing.outer .front,.turn-wing.inner .back{clip-path:inset(0 0 0 54.8%)}
+.turn-wing.outer .back{clip-path:inset(0 54.8% 0 0)}.turn-wing.inner .back{clip-path:inset(0 0 0 44.8%)}
+.turn-stage.reverse .turn-wing.outer{transform-origin:45% center}
+.turn-stage.reverse .inner .front,.turn-stage.reverse .outer .back{clip-path:inset(0 0 0 44.8%)}
+.turn-stage.reverse .outer .front,.turn-stage.reverse .inner .back{clip-path:inset(0 54.8% 0 0)}
+.turn-stage.reverse .outer .back{clip-path:inset(0 0 0 54.8%)}.turn-stage.reverse .inner .back{clip-path:inset(0 44.8% 0 0)}
+
+
+.book-ready main.wrap{background:none}
+.book-ready main.wrap:before{content:"";display:block;position:absolute;inset:0;border:0;box-shadow:none;border-radius:0;background:var(--binder) center / 100% 100% no-repeat;pointer-events:none;clip-path:polygon(.8% 5%,2.1% 1.6%,5% .45%,91.5% .45%,94.4% 2%,94.9% 5%,94.9% 42.7%,98.7% 42.7%,99.3% 44.2%,99.3% 53.9%,98.6% 55%,94.9% 55%,94.9% 94.7%,93.9% 97.4%,91.8% 98.7%,4.2% 98.7%,1.3% 96.5%,.8% 93%)}
+.bar .book-tabs a,.wordmark{white-space:nowrap}
+@media(max-width:650px){
+ .book-ready .bar{display:grid;grid-template-columns:1fr auto auto;grid-template-rows:auto auto;gap:0 10px;padding:7px 0 4px}.book-ready .bar>a{grid-area:1/1}.book-ready .bar .book-tabs{grid-area:2/1/3/4;justify-self:center;margin:0;gap:clamp(13px,5vw,26px)}.bar .book-tabs a{flex:0 0 auto}
+ .book-ready .bar nav.legacy-nav{grid-area:1/2}.book-ready .bar .disc-play{grid-area:1/3}.book-ready main.wrap:before{background-size:195% 100%;background-position:right center;clip-path:polygon(0 .45%,83.5% .45%,89% 2%,90% 5%,90% 42.7%,97.5% 42.7%,99% 44.2%,99% 53.9%,97.5% 55%,90% 55%,90% 94.7%,88% 97.4%,84% 98.7%,0 98.7%)}
+}
 </style>
 </head>
 <body>
@@ -1157,7 +1218,7 @@ coverText.prepend(heading);
 heading.append(...['.name-en','.name','#role'].map(selector=>coverText.querySelector(selector)));
 const tv=document.createElement('button');
 tv.type='button';tv.className='tv-link';tv.setAttribute('aria-label','翻到 Work 作品放映页');tv.title='翻到作品放映页';
-tv.innerHTML='<span class="tv-case" aria-hidden="true"><span class="tv-glass"><img src="films/still-9.jpg" alt=""></span><span class="tv-dial"><i></i><i></i></span></span>';
+tv.innerHTML='<img class="tv-artwork" src="art/television.webp" alt=""><span class="tv-window" aria-hidden="true"><img src="films/still-9.jpg" alt=""></span>';
 tv.onclick=()=>goToBookPage(1);
 const notesLink=document.createElement('button');
 notesLink.type='button';notesLink.className='work-notes-link';notesLink.textContent='翻开镜头手记 →';
@@ -1176,7 +1237,18 @@ const legacyNav=masthead.querySelector('nav');
 legacyNav.classList.add('legacy-nav');
 masthead.insertBefore(tabs,legacyNav);
 const wordmark=document.createElement('span');
-wordmark.className='wordmark';wordmark.textContent='JIANG LAN';
+function inkLabel(node,label){
+  node.setAttribute('aria-label',label);
+  Array.from(label).forEach((character,i)=>{
+    const span=document.createElement('span');span.className='ink-letter';
+    span.setAttribute('aria-hidden','true');span.textContent=character===' '?'\u00a0':character;
+    span.style.setProperty('--a',[-4,2,-2,4,-1,3][i%6]+'deg');
+    span.style.setProperty('--dy',['0','.045em','-.025em'][i%3]);
+    span.style.setProperty('--sy',[1.06,.93,1,1.1][i%4]);
+    node.append(span);
+  });
+}
+wordmark.className='wordmark';inkLabel(wordmark,'JIANG LAN');
 masthead.querySelector('a').append(wordmark);
 const disc=document.createElement('button');
 disc.type='button';disc.className='disc-play';disc.title='放映当前影片';disc.setAttribute('aria-label',disc.title);
@@ -1185,7 +1257,7 @@ masthead.append(disc);
 const leaves = chapters.map((chapter,i) => {
   const link = document.createElement('a');
   link.href = chapter.hash;
-  link.textContent = chapter.tab || chapter.name;
+  inkLabel(link,chapter.tab || chapter.name);
   link.hidden = !chapter.tab;
   link.setAttribute('aria-label',chapter.name);
   link.title=chapter.name;
@@ -1270,6 +1342,11 @@ function buildTurn(from,to) {
   if(!mobile || !forward) face(stage,'turn-mask',from,forward?'left':'right');
   face(sheet,'turn-face front',mobile && !forward ? to : from,forward?'right':'left');
   face(sheet,'turn-face back',mobile?null:to,forward?'left':'right');
+  // A second hinge lets the outer part of the sheet lag behind its spine.
+  const innerWing=document.createElement('div');
+  innerWing.className='turn-wing inner';innerWing.append(...Array.from(sheet.children));
+  const outerWing=innerWing.cloneNode(true);outerWing.className='turn-wing outer';
+  sheet.append(innerWing,outerWing);
   stage.append(sheet);
   stack.append(stage);
   stage.querySelectorAll('.turn-copy').forEach(copy=>{
@@ -1280,9 +1357,9 @@ function buildTurn(from,to) {
   const end = mobile && !forward ? 0 : forward ? -180 : 180;
   const duration = mobile ? 620 : 820;
   const motion = sheet.animate([
-    {transform:'rotateY('+start+'deg)','--ink-shadow':'.06'},
-    {transform:'rotateY('+((start+end)/2)+'deg)','--ink-shadow':'.36',offset:.5},
-    {transform:'rotateY('+end+'deg)','--ink-shadow':'.06'}
+    {transform:'rotateY('+start+'deg)','--ink-shadow':'.06','--page-bend':'0deg'},
+    {transform:'rotateY('+((start+end)/2)+'deg)','--ink-shadow':'.36','--page-bend':(forward?18:-18)+'deg',offset:.5},
+    {transform:'rotateY('+end+'deg)','--ink-shadow':'.06','--page-bend':'0deg'}
   ],{duration,fill:'both',easing:'linear'});
   motion.pause();
   motion.currentTime=0;
