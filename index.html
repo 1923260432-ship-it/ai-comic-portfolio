@@ -62,7 +62,9 @@
 
 .comic-job .muted:empty{display:none}.editing .comic-job .muted:empty{display:block;min-height:1.5em}.editing .comic-job [data-placeholder]:empty:before{content:attr(data-placeholder);color:#aaa}.phone-line a{text-decoration:underline;text-underline-offset:.2em}
 
-#landing .backdrop{filter:grayscale(1)}#landing:before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:var(--silver-grain);opacity:.65}.gravity-grain{position:absolute;top:0;left:0;z-index:-1;width:240px;height:240px;pointer-events:none;opacity:0;transition:opacity .19s;filter:grayscale(1);mask-image:radial-gradient(circle,#000 44%,transparent 70%)}.gravity-grain.visible{opacity:1}@media(hover:none),(prefers-reduced-motion:reduce){.gravity-grain{display:none}}
+#landing .backdrop{filter:grayscale(1)}#landing:before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:var(--silver-grain);opacity:.65}.gravity-grain{position:absolute;top:0;left:0;z-index:-1;width:240px;height:240px;pointer-events:none;opacity:0;transition:opacity .19s;filter:grayscale(1);mask-image:radial-gradient(circle,#000 44%,transparent 70%)}.gravity-grain.visible{opacity:1}@media(prefers-reduced-motion:reduce){.gravity-grain{display:none}}
+
+@media(pointer:coarse){#landing{touch-action:pan-y pinch-zoom;-webkit-touch-callout:none}#landing .scroll-cue{letter-spacing:.06em;pointer-events:none}}.touch-lit::after{transform:scaleX(1)!important}
 </style></head><body>
 
 <header class="mast"><a class="monogram" href="#home" aria-label="Jiang Lan 首页"><b>J</b><span>IANG&nbsp;</span><b>L</b><span>AN</span></a><nav aria-label="主导航"><a href="#home">Home</a><a href="#work">Work</a><a href="#studio">Studio</a></nav><a class="contact-tab" href="#contact">联系我 <span aria-hidden="true">↗</span></a></header>
@@ -261,11 +263,16 @@ landing.addEventListener('wheel',event=>{
   total+=Math.abs(event.deltaY)>Math.abs(event.deltaX)?event.deltaY:event.deltaX;
   if(event.deltaMode!==0||Math.abs(total)>26){selectFilm(activeFilm+Math.sign(total));wheelAt=t;total=0}
 },{passive:false});
-let suppressClickUntil=0;
-landing.addEventListener('touchstart',e=>{start=e.touches.length===1?[e.touches[0].clientX,e.touches[0].clientY]:undefined},{passive:true});
+let suppressClickUntil=0, touchBegan=0, multipleTouches=false;
+landing.addEventListener('touchstart',e=>{touchBegan=performance.now();multipleTouches=e.touches.length!==1;start=e.touches.length===1?[e.touches[0].clientX,e.touches[0].clientY]:undefined},{passive:true});
 landing.addEventListener('touchend',e=>{
-  if(!start)return;const touch=e.changedTouches[0],dx=start[0]-touch.clientX,dy=start[1]-touch.clientY;start=undefined;
-  const distance=Math.abs(dx)>Math.abs(dy)?dx:dy;if(Math.abs(distance)<35)return;
+  if(multipleTouches || !start)return;const touch=e.changedTouches[0],dx=start[0]-touch.clientX,dy=start[1]-touch.clientY;start=undefined;
+  const distance=Math.abs(dx)>Math.abs(dy)?dx:dy;if(Math.abs(distance)<35){
+    const quickTap=performance.now()-touchBegan<=320 && Math.hypot(dx,dy)<=9;
+    if(quickTap && e.target.closest('#open-film,#play-caption,#brand-title,.film-meta>span'))openPlayer();
+    if(!quickTap || player.open)suppressClickUntil=performance.now()+420;
+    return;
+  }
   suppressClickUntil=performance.now()+420;selectFilm(activeFilm+Math.sign(distance));
 },{passive:true});
 landing.addEventListener('touchcancel',()=>{start=undefined});
@@ -373,9 +380,9 @@ function clearStroke(){
   lineStroke.hidden = true;
   hoveredField = hoveredRow = undefined;
 }
-studioCopy.addEventListener('pointermove', event => {
+function highlightCopyLine(event){
   const field = event.target.closest('p,li,h1,h2,h3');
-  if (!field || event.pointerType==='touch' || (field.isContentEditable && field===document.activeElement)) { clearStroke(); return; }
+  if (!field || (field.isContentEditable && (event.pointerType==='touch'||field===document.activeElement))) { clearStroke(); return; }
   const range = document.createRange();
   range.selectNodeContents(field);
   const rows = Array.from(range.getClientRects());
@@ -391,8 +398,22 @@ studioCopy.addEventListener('pointermove', event => {
   lineStroke.getAnimations().forEach(animation=>animation.cancel());
   if (!reduce.matches) lineStroke.animate([{transform:'scaleX(0)'},{transform:'scaleX(1)'}],
     {duration:390,easing:'cubic-bezier(.2,.75,.2,1)'});
+}
+studioCopy.addEventListener('pointermove',e=>{if(e.pointerType!=='touch')highlightCopyLine(e)});
+let touchStrokeTimer;
+document.addEventListener('pointerdown',e=>{
+  if(e.pointerType!=='touch'||!e.isPrimary)return;
+  clearTimeout(touchStrokeTimer);clearStroke();
+  if(e.target.isContentEditable)return;
+  if(studioCopy.contains(e.target))highlightCopyLine(e);
+  const label=e.target.closest(sweepLabels+',#brand-title,.name-en');
+  if(label){
+    if(!label.matches('#brand-title,.name-en'))sweepCopy(label);
+    label.classList.add('touch-lit');setTimeout(()=>label.classList.remove('touch-lit'),650);
+  }
+  touchStrokeTimer=setTimeout(clearStroke,650);
 });
-studioCopy.addEventListener('pointerleave',clearStroke);
+studioCopy.addEventListener('pointerleave',e=>{if(e.pointerType!=='touch')clearStroke()});
 window.addEventListener('scroll',clearStroke,{passive:true});
 window.addEventListener('resize',clearStroke);
 window.addEventListener('hashchange',clearStroke);
@@ -540,16 +561,25 @@ function installFilmTexture(){
     lens.style.transform='translate3d('+(x-rect.left-c)+'px,'+(y-rect.top-c)+'px,0)';
     lens.classList.add('visible');
   }
-  landing.addEventListener('pointermove',e=>{
-    if(e.pointerType!=='mouse'||reduce.matches)return;
-    x=e.clientX;y=e.clientY;
+  function followPoint(point,touch){
+    if(reduce.matches)return;
+    x=point.clientX;y=point.clientY-(touch?36:0);
     if(!frame)frame=requestAnimationFrame(draw);
-  });
-  landing.addEventListener('pointerleave',stop);landing.addEventListener('pointercancel',stop);
+  }
+  landing.addEventListener('pointermove',e=>{if(e.pointerType==='mouse')followPoint(e,false)});
+  function followTouch(e){if(e.touches.length===1)followPoint(e.touches[0],true);else stop()}
+  landing.addEventListener('touchstart',followTouch,{passive:true});
+  landing.addEventListener('touchmove',followTouch,{passive:true});
+  landing.addEventListener('touchend',stop,{passive:true});
+  landing.addEventListener('touchcancel',stop,{passive:true});
+  landing.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')stop()});
   window.addEventListener('blur',stop);
   document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});
 }
 installFilmTexture();
+const touchLayout=matchMedia('(hover:none), (pointer:coarse)');
+function updateCue(){document.querySelector('.scroll-cue').firstChild.textContent=touchLayout.matches?(reduce.matches?'滑动切片':'按住探索 · 滑动切片'):'SCROLL '}
+updateCue();touchLayout.addEventListener('change',updateCue);
 
 
 navigate();selectFilm(0);
