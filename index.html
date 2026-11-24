@@ -67,6 +67,19 @@
 @media(pointer:coarse){#landing{touch-action:pan-y pinch-zoom;-webkit-touch-callout:none}#landing .scroll-cue{letter-spacing:.06em;pointer-events:none}}.touch-lit::after{transform:scaleX(1)!important}
 
 @media(pointer:coarse){#grid{-webkit-touch-callout:none}.monogram.touch-lit span{max-width:3.5em}.monogram.touch-lit{background:#171717;z-index:1}}
+
+.finger-lens{position:absolute;z-index:2;width:160px;height:160px;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;display:none;
+background:radial-gradient(circle,rgba(0,0,0,.94) 0 5%,rgba(0,0,0,.72) 9%,rgba(0,0,0,.28) 26%,transparent 65%)}
+.finger-lens.on{display:block}.finger-dust{position:absolute;inset:0;animation:finger-orbit 3s linear infinite}
+.finger-dust i{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;box-shadow:0 0 2px #111}
+@keyframes finger-orbit{to{transform:rotate(-1turn)}}
+#touch-demo{display:none}
+@media(max-width:650px),(pointer:coarse){
+  #landing{touch-action:pinch-zoom}
+  #touch-demo{display:block;position:absolute;z-index:3;right:18px;top:78px;font-size:13px;background:#15151599;border:1px solid #fffa;border-radius:20px;padding:7px 13px}
+  .scroll-cue{display:none}
+}
+@media(prefers-reduced-motion:reduce){.finger-dust{animation:none}}
 </style></head><body>
 
 <header class="mast"><a class="monogram" href="#home" aria-label="Jiang Lan 首页"><b>J</b><span>IANG&nbsp;</span><b>L</b><span>AN</span></a><nav aria-label="主导航"><a href="#home">Home</a><a href="#work">Work</a><a href="#studio">Studio</a></nav><a class="contact-tab" href="#contact">联系我 <span aria-hidden="true">↗</span></a></header>
@@ -75,7 +88,7 @@
 <button id="open-film" aria-label="播放当前正片"></button>
 <div class="hero-caption"><h1 id="brand-title" aria-label="Jiang Lan Films">JIANG LAN FILMS</h1><div class="film-meta"><span>姜澜 · AI 漫剧</span><i></i><span id="shot-id">FILM 01</span><i></i><button id="play-caption">播放正片 <b aria-hidden="true">↗</b></button></div></div>
 <div class="slide-tools"><div class="count"><span id="counter">01</span><small> / 09</small></div><div id="dots" aria-label="选择影片"></div></div>
-<span class="scroll-cue" aria-hidden="true">SCROLL <i></i></span>
+<button id="touch-demo" type="button">体验颗粒</button><span class="scroll-cue" aria-hidden="true">SCROLL <i></i></span>
 </section>
 <section class="inside" id="works" hidden><div class="section-head"><h1>Selected films<span>.</span></h1><span>作品 / 09</span></div><div id="grid" role="group" aria-label="九支影片，左右浏览，选择封面放映"></div><div class="rail-foot"><span>横滑选片 · 点封面放映</span><input id="rail-scrub" type="range" min="0" max="1000" value="0" aria-label="浏览影片条"></div></section>
 <main class="inside" id="studio" hidden>
@@ -118,7 +131,7 @@
 <script>const $ = selector => document.querySelector(selector);
 const landing=$('#landing'), grid=$('#grid'), player=$('#player'), movie=player.querySelector('video');
 const reduce=matchMedia('(prefers-reduced-motion: reduce)');
-const originalFields = [...document.querySelectorAll('main p, main h2, main h3, main li:not(:has(strong)), main li strong, main li span, #role'), ...document.querySelectorAll('[data-work-field]')];
+const originalFields = [...document.querySelectorAll('main p, main h2, main h3, main li, main li strong, main li span, #role')].filter(node=>node.tagName!=='LI'||!node.querySelector('strong')).concat([...document.querySelectorAll('[data-work-field]')]);
 // Keep the positional fields used by older saved drafts, then append the new entry.
 const fields=[...originalFields.filter(field=>!field.closest('.comic-job')), ...originalFields.filter(field=>field.closest('.comic-job'))];
 function syncPhone(editing){
@@ -179,13 +192,13 @@ function fillGrid(){
 }
 function animateText(node){
   if(reduce.matches)return;
-  node.getAnimations().forEach(animation=>animation.cancel());
+  node.getAnimations?.().forEach(animation=>animation.cancel());
   node.animate([{opacity:.1,transform:'translateY(.48em)'},{opacity:1,transform:'translateY(0)'}],{duration:480,easing:'cubic-bezier(.16,1,.3,1)'});
 }
 function letterSweep(node){
   if(reduce.matches)return;
   [...node.children].forEach((letter,i)=>{
-    letter.getAnimations().forEach(animation=>animation.cancel());
+    letter.getAnimations?.().forEach(animation=>animation.cancel());
     letter.animate([{opacity:.38,transform:'translateY(.055em)'},{opacity:1,transform:'translateY(0)'}],{delay:i*20,duration:250});
   });
 }
@@ -203,7 +216,7 @@ function releaseLayer(layer){if(!layer)return;const v=layer.querySelector('video
 function paintHero(){
   if(landing.hidden||player.open||document.hidden)return;
   const i=activeFilm,entry=filmLibrary[i],custom=fileURL(i),key=custom||entry.src;
-  if(heroKey===key){const v=[...landing.querySelectorAll('.backdrop')].at(-1)?.querySelector('video');if(v&&!reduce.matches)v.play().catch(()=>{});return}
+  if(heroKey===key){const v=Array.from(landing.querySelectorAll('.backdrop')).pop()?.querySelector('video');if(v&&!reduce.matches)v.play().catch(()=>{});return}
   heroKey=key;
   const previous=[...landing.querySelectorAll('.backdrop')];
   previous.forEach(layer=>layer.querySelector('video')?.pause());
@@ -318,13 +331,9 @@ function sweepCopy(field, row){
   stopCopySweep();
   if(reduce.matches || !field.textContent.trim()) return;
   if (!window.CSS?.highlights || typeof Highlight!=='function') {
-    fallbackMotion=field.animate([{maskPosition:'100% 0'},{maskPosition:'0% 0'}],
-      {duration:580,easing:'linear'});
     const mask='linear-gradient(90deg,#000 30%,#0005 48%,#000 60%)';
-    fallbackMotion.effect.setKeyframes([
-      {maskImage:mask,maskSize:'300% 100%',maskPosition:'100% 0'},
-      {maskImage:mask,maskSize:'300% 100%',maskPosition:'0% 0'}
-    ]);
+    const frame=position=>({maskImage:mask,webkitMaskImage:mask,maskSize:'300% 100%',webkitMaskSize:'300% 100%',maskPosition:position,webkitMaskPosition:position});
+    fallbackMotion=field.animate?.([{...frame('100% 0'),opacity:.65},{...frame('0% 0'),opacity:1}],{duration:580,easing:'linear'});
     return;
   }
   const letters=[];
@@ -398,7 +407,7 @@ function highlightCopyLine(event){
   hoveredField=field; hoveredRow=index;
   sweepCopy(field,box);
   lineStroke.hidden=false;
-  lineStroke.getAnimations().forEach(animation=>animation.cancel());
+  lineStroke.getAnimations?.().forEach(animation=>animation.cancel());
   if (!reduce.matches) lineStroke.animate([{transform:'scaleX(0)'},{transform:'scaleX(1)'}],
     {duration:390,easing:'cubic-bezier(.2,.75,.2,1)'});
 }
@@ -570,7 +579,7 @@ function installFilmTexture(){
     frame=requestAnimationFrame(draw);
     if(t-last<32)return;
     last=t;
-    const layer=[...landing.querySelectorAll('.backdrop')].at(-1);
+    const layer=Array.from(landing.querySelectorAll('.backdrop')).pop();
     if(!layer)return;
     const media=layer.querySelector('video.live') || layer.querySelector('img');
     if(!media)return;
@@ -603,7 +612,7 @@ function installFilmTexture(){
     if(!frame)frame=requestAnimationFrame(draw);
   }
   landing.addEventListener('pointermove',e=>{if(e.pointerType==='mouse')followPoint(e,false)});
-  function followTouch(e){if(e.touches.length===1)followPoint(e.touches[0],true);else stop()}
+  function followTouch(){stop()}
   landing.addEventListener('touchstart',followTouch,{passive:true});
   landing.addEventListener('touchmove',followTouch,{passive:true});
   landing.addEventListener('touchend',stop,{passive:true});
@@ -612,10 +621,49 @@ function installFilmTexture(){
   window.addEventListener('blur',stop);
   document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});
 }
+
+function installFingerLens(){
+  const field=document.createElement('div'), dust=document.createElement('div');
+  field.className='finger-lens';field.setAttribute('aria-hidden','true');
+  dust.className='finger-dust';field.append(dust);landing.append(field);
+  for(let i=0;i<64;i++){
+    const dot=document.createElement('i'),p=(i+.5)/64;
+    const radius=10+Math.sqrt(p)*58,angle=i*2.39996+3*(1-p);
+    dot.style.left=(50+Math.cos(angle)*radius/1.6)+'%';
+    dot.style.top=(50+Math.sin(angle)*radius/1.6)+'%';
+    dot.style.opacity=String(.35+.6*(1-p));
+    dust.append(dot);
+  }
+  let timer;
+  function hide(){clearTimeout(timer);field.classList.remove('on')}
+  function place(x,y){
+    clearTimeout(timer);
+    const r=landing.getBoundingClientRect();
+    field.style.left=(x-r.left)+'px';field.style.top=(y-r.top-28)+'px';field.classList.add('on');
+  }
+  function touch(e){
+    if(e.touches.length!==1||e.target.closest('#dots, #touch-demo')){hide();return}
+    place(e.touches[0].clientX,e.touches[0].clientY);
+  }
+  landing.addEventListener('touchstart',touch,{passive:true});
+  landing.addEventListener('touchmove',touch,{passive:true});
+  landing.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'&&!e.target.closest('#dots,#touch-demo'))place(e.clientX,e.clientY)});
+  landing.addEventListener('pointermove',e=>{if(e.pointerType==='touch'&&e.buttons===1&&!e.target.closest('#dots,#touch-demo'))place(e.clientX,e.clientY)});
+  const release=()=>{clearTimeout(timer);timer=setTimeout(hide,260)};
+  for(const event of ['touchend','touchcancel','pointerup','pointercancel'])landing.addEventListener(event,release,{passive:true});
+  $('#touch-demo').onclick=()=>{
+    const r=landing.getBoundingClientRect();
+    place(r.left+r.width*.5,r.top+r.height*.44);
+    timer=setTimeout(hide,1800);
+  };
+  window.addEventListener('hashchange',hide);
+}
+installFingerLens();
+
 installFilmTexture();
 const touchLayout=matchMedia('(hover:none), (pointer:coarse)');
 function updateCue(){document.querySelector('.scroll-cue').firstChild.textContent=touchLayout.matches?(reduce.matches?'滑动切片':'按住探索 · 滑动切片'):'SCROLL '}
-updateCue();touchLayout.addEventListener('change',updateCue);
+updateCue();if(touchLayout.addEventListener)touchLayout.addEventListener('change',updateCue);else touchLayout.addListener(updateCue);
 
 
 navigate();selectFilm(0);
