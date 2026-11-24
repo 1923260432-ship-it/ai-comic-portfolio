@@ -61,11 +61,13 @@
 @media(prefers-reduced-motion:reduce){#grid .tile,#grid .tile img{transition:none;transform:none}}
 
 .comic-job .muted:empty{display:none}.editing .comic-job .muted:empty{display:block;min-height:1.5em}.editing .comic-job [data-placeholder]:empty:before{content:attr(data-placeholder);color:#aaa}.phone-line a{text-decoration:underline;text-underline-offset:.2em}
+
+#landing .backdrop{filter:grayscale(1)}#landing:before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:var(--silver-grain);opacity:.65}.gravity-grain{position:absolute;top:0;left:0;z-index:-1;width:240px;height:240px;pointer-events:none;opacity:0;transition:opacity .19s;filter:grayscale(1);mask-image:radial-gradient(circle,#000 44%,transparent 70%)}.gravity-grain.visible{opacity:1}@media(hover:none),(prefers-reduced-motion:reduce){.gravity-grain{display:none}}
 </style></head><body>
 
 <header class="mast"><a class="monogram" href="#home" aria-label="Jiang Lan 首页"><b>J</b><span>IANG&nbsp;</span><b>L</b><span>AN</span></a><nav aria-label="主导航"><a href="#home">Home</a><a href="#work">Work</a><a href="#studio">Studio</a></nav><a class="contact-tab" href="#contact">联系我 <span aria-hidden="true">↗</span></a></header>
 <section id="landing" aria-label="作品轮播">
-<div class="backdrop" aria-hidden="true"><img src="films/still-2.jpg" alt="" fetchpriority="high"></div>
+<div class="backdrop" aria-hidden="true"><img src="films/noir/2.jpg" alt="" fetchpriority="high"></div>
 <button id="open-film" aria-label="播放当前正片"></button>
 <div class="hero-caption"><h1 id="brand-title" aria-label="Jiang Lan Films">JIANG LAN FILMS</h1><div class="film-meta"><span>姜澜 · AI 漫剧</span><i></i><span id="shot-id">FILM 01</span><i></i><button id="play-caption">播放正片 <b aria-hidden="true">↗</b></button></div></div>
 <div class="slide-tools"><div class="count"><span id="counter">01</span><small> / 09</small></div><div id="dots" aria-label="选择影片"></div></div>
@@ -203,13 +205,12 @@ function paintHero(){
   previous.forEach(layer=>layer.querySelector('video')?.pause());
   const layer=document.createElement('div');layer.className='backdrop incoming';layer.style.setProperty('--focal',focal[i]+'%');
   layer.style.setProperty('--cut',i>=previousIndex?'100% 0 0 0':'0 0 100% 0');previousIndex=i;
-  if(!custom){const img=new Image();img.alt='';img.src=entry.poster;layer.append(img)}
+  if(!custom){const img=new Image();img.alt='';img.src='films/noir/'+(entry.originalSlot+1)+'.jpg';layer.append(img)}
   if(custom||(!reduce.matches&&!navigator.connection?.saveData)){
     const clip=document.createElement('video');clip.playsInline=true;clip.muted=true;clip.loop=true;clip.preload='metadata';
-    if(!custom)clip.poster=entry.poster;
+    if(!custom)clip.poster='films/noir/'+(entry.originalSlot+1)+'.jpg';
     clip.onloadeddata=()=>{clip.classList.add('live');if(!reduce.matches&&!navigator.connection?.saveData&&layer.isConnected&&heroKey===key&&!player.open&&!landing.hidden)clip.play().catch(()=>{})};
-    const motionFolder=matchMedia('(max-width:650px)').matches?'previews':'motion';
-    clip.src=custom||('films/'+motionFolder+'/film-'+(entry.originalSlot+1)+'.mp4');
+    clip.src=custom||('films/noir/'+(entry.originalSlot+1)+'.mp4');
     layer.append(clip);
   }
   $('#open-film').before(layer);
@@ -481,6 +482,74 @@ workRail.addEventListener('scroll',syncRail,{passive:true});
 railScrub.oninput=()=>{stopRail();workRail.scrollLeft=railLimit()*railScrub.value/1000;anchorX=null};
 window.addEventListener('resize',()=>{stopRail();anchorX=null;syncRail()});
 player.addEventListener('close',()=>{anchorX=null;stopRail()});
+
+
+function installFilmTexture(){
+  const tile=document.createElement('canvas');
+  tile.width=tile.height=128;
+  const tc=tile.getContext('2d');
+  if(!tc)return;
+  const noise=tc.createImageData(128,128);
+  for(let i=0;i<noise.data.length;i+=4){
+    const v=Math.random()>.5?255:0;
+    noise.data[i]=noise.data[i+1]=noise.data[i+2]=v;
+    noise.data[i+3]=Math.floor(Math.random()*34);
+  }
+  tc.putImageData(noise,0,0);
+  landing.style.setProperty('--silver-grain','url('+tile.toDataURL()+')');
+  const lens=document.createElement('canvas'), sample=document.createElement('canvas');
+  const size=240, c=size/2;
+  lens.width=lens.height=sample.width=sample.height=size;
+  lens.className='gravity-grain';lens.setAttribute('aria-hidden','true');landing.append(lens);
+  const ctx=lens.getContext('2d'), source=sample.getContext('2d');
+  if(!ctx||!source)return;
+  const dust=Array.from({length:170},()=>({angle:Math.random()*Math.PI*2,orbit:Math.random(),light:Math.random()}));
+  const shade=ctx.createRadialGradient(c,c,2,c,c,c*.93);
+  shade.addColorStop(0,'rgba(1,1,1,.94)');shade.addColorStop(.12,'rgba(2,2,2,.8)');shade.addColorStop(.42,'rgba(6,6,6,.22)');shade.addColorStop(1,'transparent');
+  let x=0,y=0,frame=0,last=0;
+  function stop(){cancelAnimationFrame(frame);frame=0;lens.classList.remove('visible')}
+  function draw(t){
+    if(landing.hidden||player.open||document.hidden||reduce.matches){stop();return}
+    frame=requestAnimationFrame(draw);
+    if(t-last<32)return;
+    last=t;
+    const layer=[...landing.querySelectorAll('.backdrop')].at(-1);
+    if(!layer)return;
+    const media=layer.querySelector('video.live') || layer.querySelector('img');
+    if(!media)return;
+    const w=media.videoWidth||media.naturalWidth,h=media.videoHeight||media.naturalHeight;
+    if(!w||!h)return;
+    const rect=landing.getBoundingClientRect(), scale=Math.max(rect.width/w,rect.height/h);
+    const focal=parseFloat(layer.style.getPropertyValue('--focal')||'34')/100;
+    const sx=(x-rect.left+(w*scale-rect.width)/2-c)/scale, sy=(y-rect.top+(h*scale-rect.height)*focal-c)/scale;
+    source.clearRect(0,0,size,size);source.drawImage(media,sx,sy,size/scale,size/scale,0,0,size,size);
+    ctx.clearRect(0,0,size,size);
+    // Sample a wider neighbourhood in progressively smaller rings to pull the image inward.
+    for(let r=c;r>4;r-=5){
+      const depth=1-r/c, factor=1-.51*depth*depth;
+      ctx.save();ctx.beginPath();ctx.arc(c,c,r,0,2*Math.PI);ctx.clip();
+      ctx.translate(c,c);ctx.rotate(.17*depth*depth);ctx.scale(factor,factor);ctx.drawImage(sample,-c,-c);ctx.restore();
+    }
+    ctx.fillStyle=shade;ctx.fillRect(0,0,size,size);
+    for(const p of dust){
+      const orbit=(p.orbit+1-(t*.00016)%1)%1, radius=6+orbit*(c-11);
+      const a=p.angle+2.9*(1-orbit)*(1-orbit)-t*.00023;
+      ctx.fillStyle='rgba(243,240,232,'+((.12+p.light*.57)*Math.sin(Math.PI*orbit))+')';
+      ctx.fillRect(c+Math.cos(a)*radius,c+Math.sin(a)*radius,.6+p.light,.7+p.light);
+    }
+    lens.style.transform='translate3d('+(x-rect.left-c)+'px,'+(y-rect.top-c)+'px,0)';
+    lens.classList.add('visible');
+  }
+  landing.addEventListener('pointermove',e=>{
+    if(e.pointerType!=='mouse'||reduce.matches)return;
+    x=e.clientX;y=e.clientY;
+    if(!frame)frame=requestAnimationFrame(draw);
+  });
+  landing.addEventListener('pointerleave',stop);landing.addEventListener('pointercancel',stop);
+  window.addEventListener('blur',stop);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});
+}
+installFilmTexture();
 
 
 navigate();selectFilm(0);
