@@ -59,6 +59,8 @@
 #rail-scrub::-moz-range-thumb{border:0;width:clamp(30px,7vw,110px);height:4px;border-radius:1px;background:#e7e5dc}
 @media(max-width:650px){#works{padding-top:99px}#grid .tile{width:clamp(155px,min(67vw,40svh),300px)}.rail-foot{margin-top:10px}.rail-foot span{font-size:11px}}
 @media(prefers-reduced-motion:reduce){#grid .tile,#grid .tile img{transition:none;transform:none}}
+
+.comic-job .muted:empty{display:none}.editing .comic-job .muted:empty{display:block;min-height:1.5em}.editing .comic-job [data-placeholder]:empty:before{content:attr(data-placeholder);color:#aaa}.phone-line a{text-decoration:underline;text-underline-offset:.2em}
 </style></head><body>
 
 <header class="mast"><a class="monogram" href="#home" aria-label="Jiang Lan 首页"><b>J</b><span>IANG&nbsp;</span><b>L</b><span>AN</span></a><nav aria-label="主导航"><a href="#home">Home</a><a href="#work">Work</a><a href="#studio">Studio</a></nav><a class="contact-tab" href="#contact">联系我 <span aria-hidden="true">↗</span></a></header>
@@ -80,7 +82,7 @@
 <p>通过全国计算机二级考试，熟练使用 Office 等办公软件。持 C2 驾照。</p>
 </div></section>
 <section class="section work-history" id="experience"><h2>工作经历</h2><div class="entries">
-<article><h3>浙江大丰文化有限公司 · 亚运会博物馆运营</h3><p class="muted">2025.02 起（旧简历记为至今）</p><ul>
+<article class="comic-job"><h3 data-placeholder="公司名称 · 岗位">AI 漫剧制作师</h3><p class="muted" data-placeholder="填写任职时间"></p><ul><li>制作 AI 漫剧，作品包括《星际 EP1》和《软柿子》。</li><li>制作竖屏剧情短片，作品涵盖校园、都市情感与科幻题材。</li><li>完成多语种漫剧片段，作品集中收录了英语和西班牙语字幕版本。</li></ul></article><article><h3>浙江大丰文化有限公司 · 亚运会博物馆运营</h3><p class="muted">2025.02 起（旧简历记为至今）</p><ul>
 <li>负责政务、研学及旅行团讲解与引导，日均讲解 2–3 场，累计服务超过 5,000 人次，接待零投诉。</li>
 <li>协助文创商店销售、陈列、收银及库存管理，日均协助完成销售额 2,000 元。</li>
 <li>负责展厅设备巡查、故障上报及基础维护，累计巡检 300 次；完成月度或季度库存盘点 40 次。</li>
@@ -104,13 +106,26 @@
 <li>浙江省会展策划大赛省金奖，互联网＋校赛前十。</li>
 <li>杭州亚运会志愿者、杭州环保志愿者。</li>
 </ul></article></div></section>
-<section class="section" id="contact"><h2>联系方式</h2><div class="entries"><p>邮箱　1923260432@qq.com</p></div></section>
+<section class="section" id="contact"><h2>联系方式</h2><div class="entries"><p class="phone-line">电话　<a href="tel:13732209265">13732209265</a></p><p>邮箱　1923260432@qq.com</p></div></section>
 </main>
 <dialog id="player" aria-label="作品正片"><div class="player-head"><button id="leave">← 返回</button><span id="player-count"></span><button id="full">全屏 ↗</button></div><video controls playsinline preload="none"></video><div class="player-foot"><button id="previous">← 上一支</button><span id="play-error" role="status"></span><button id="next">下一支 →</button></div></dialog>
 <script>const $ = selector => document.querySelector(selector);
 const landing=$('#landing'), grid=$('#grid'), player=$('#player'), movie=player.querySelector('video');
 const reduce=matchMedia('(prefers-reduced-motion: reduce)');
-const fields = [...document.querySelectorAll('main p, main h2, main h3, main li:not(:has(strong)), main li strong, main li span, #role'), ...document.querySelectorAll('[data-work-field]')];
+const originalFields = [...document.querySelectorAll('main p, main h2, main h3, main li:not(:has(strong)), main li strong, main li span, #role'), ...document.querySelectorAll('[data-work-field]')];
+// Keep the positional fields used by older saved drafts, then append the new entry.
+const fields=[...originalFields.filter(field=>!field.closest('.comic-job')), ...originalFields.filter(field=>field.closest('.comic-job'))];
+function syncPhone(editing){
+  const line=document.querySelector('.phone-line');
+  const text=line.textContent;
+  if(editing){line.textContent=text;return}
+  const match=text.match(/(?:\+?86[ -]?)?1(?:[ -]?\d){10}/);
+  if(!match)return;
+  const link=document.createElement('a');
+  link.href='tel:'+match[0].replace(/[^+\d]/g,'');
+  link.textContent=match[0];
+  line.replaceChildren(text.slice(0,match.index),link,text.slice(match.index+match[0].length));
+}
 let saved={},pendingVideos=[],pendingTitles=[],studyImages=['',''],activeFilm=0;
 const editButtons=[...document.querySelectorAll('.edit-start')], bar=$('#edit-bar'), message=$('#edit-message'),slot=$('#edit-film-slot'),titleInput=$('#edit-film-title');
 const filmLibrary = ["软柿子","ep1(1)","ep1(2)","EP1（11 文件夹）","爆款月亮失约止于盛夏大码男孩西语","微信视频2026-11-22_204752_624","ep1 修改后 1019","ep1","星际EP1"].map((title,i) => ({title,originalSlot:i,src:i === 0 ? 'showreel.mp4' : 'films/film-' + (i+1) + '.mp4',poster:'films/still-' + (i+1) + '.jpg'}));
