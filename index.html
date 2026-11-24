@@ -11,14 +11,14 @@
 #shot-id{display:inline-block;overflow:hidden;line-height:1.25}.hero-caption h1{white-space:nowrap}.hero-caption h1{letter-spacing:-.06em}
 
 /* A single stroke follows the hovered label or line of copy. */
-:is(.mast a,#brand-title,.name-en,.film-meta>span,.film-meta button,.count,.section-head>*,.player-head button,.player-foot button,#player-count){position:relative}
+:is(.mast a,#brand-title,.name-en,.film-meta>span,.film-meta button,.count,.rail-foot span,.section-head>*,.player-head button,.player-foot button,#player-count){position:relative}
 .name-en{display:inline-block}
 .film-meta>span{pointer-events:auto;cursor:pointer}
 .contact-tab{--line-inset:11px}
 .contact-tab:is(:hover,:focus-visible){background-size:100% 100%;background-image:linear-gradient(#353532,#353532);color:white}
 :is(.player-head,.player-foot) button{--line-inset:8px}
 .mast nav a[aria-current]{font-weight:650}
-:is(.mast a,#brand-title,.name-en,.film-meta>span,.film-meta button,.count,.section-head>*,.scroll-cue,.player-head button,.player-foot button,#player-count)::after{
+:is(.mast a,#brand-title,.name-en,.film-meta>span,.film-meta button,.count,.rail-foot span,.section-head>*,.scroll-cue,.player-head button,.player-foot button,#player-count)::after{
   content:"";position:absolute;pointer-events:none;left:var(--line-inset,0px);right:var(--line-inset,0px);bottom:0;
   height:var(--stroke,1px);background:#fff;transform:scaleX(0);transform-origin:left;transition:transform .39s cubic-bezier(.2,.75,.2,1)
 }
@@ -27,7 +27,7 @@
 .mast nav a::after{bottom:4px}
 .scroll-cue::after{right:37px}
 @media(hover:hover){
-  :is(.mast a,#brand-title,.name-en,.film-meta>span,.film-meta button,.count,.section-head>*,.scroll-cue,.player-head button,.player-foot button,#player-count):hover::after{transform:scaleX(1)}
+  :is(.mast a,#brand-title,.name-en,.film-meta>span,.film-meta button,.count,.rail-foot span,.section-head>*,.scroll-cue,.player-head button,.player-foot button,#player-count):hover::after{transform:scaleX(1)}
 }
 :is(.mast a,#brand-title,.name-en,.film-meta button,.player-head button,.player-foot button):focus-visible::after{transform:scaleX(1)}
 .copy-underline{position:fixed;z-index:3;height:1px;background:white;pointer-events:none;transform-origin:left}
@@ -37,6 +37,28 @@
 ::highlight(film-soft){color:#aaa}
 ::highlight(film-light){color:#fff}
 #edit-bar ::highlight(film-light),.edit-start::highlight(film-light){color:#151515}
+
+#works{width:100%;padding:clamp(108px,15vh,150px) 0 clamp(28px,6vh,70px);--gutter:clamp(20px,4.2vw,78px);--frame-gap:clamp(9px,1.05vw,20px)}
+#works .section-head{margin:0 var(--gutter) clamp(18px,3.6vh,48px);align-items:end}
+#works .section-head h1{font-size:clamp(48px,6.8vw,120px)}
+#grid{display:flex;align-items:center;overflow-x:auto;overflow-y:hidden;
+  gap:var(--frame-gap);padding:9px var(--gutter) 10px;scroll-padding-inline:var(--gutter);
+  scrollbar-width:none;overscroll-behavior-x:contain;user-select:none;isolation:isolate}
+#grid::-webkit-scrollbar{display:none}
+#grid .tile{flex:0 0 auto;width:clamp(180px,min(24vw,34svh),420px);aspect-ratio:2/3;display:block;background:#25241f;
+  border-radius:2px;outline-offset:3px;transition:transform .32s ease}
+#grid .tile::after{content:none}
+#grid .tile img,#grid .tile video{display:block;object-fit:cover;object-position:50% 38%}
+@media(hover:hover){#grid .tile:hover{transform:scale(1.022);z-index:1}}
+.rail-foot{margin:14px var(--gutter) 0;display:flex;align-items:center;gap:clamp(12px,2vw,32px);color:#c1c0bb}
+.rail-foot span{font-size:12px;letter-spacing:.08em;flex:none}
+#rail-scrub{appearance:none;flex:1;min-width:45px;margin:0;height:24px;background:transparent;cursor:ew-resize}
+#rail-scrub::-webkit-slider-runnable-track{height:2px;background:#4e4d49}
+#rail-scrub::-webkit-slider-thumb{appearance:none;width:clamp(30px,7vw,110px);height:4px;margin-top:-1px;background:#e7e5dc;border-radius:1px}
+#rail-scrub::-moz-range-track{height:2px;background:#4e4d49}
+#rail-scrub::-moz-range-thumb{border:0;width:clamp(30px,7vw,110px);height:4px;border-radius:1px;background:#e7e5dc}
+@media(max-width:650px){#works{padding-top:99px}#grid .tile{width:clamp(155px,min(67vw,40svh),300px)}.rail-foot{margin-top:10px}.rail-foot span{font-size:11px}}
+@media(prefers-reduced-motion:reduce){#grid .tile,#grid .tile img{transition:none;transform:none}}
 </style></head><body>
 
 <header class="mast"><a class="monogram" href="#home" aria-label="Jiang Lan 首页"><b>J</b><span>IANG&nbsp;</span><b>L</b><span>AN</span></a><nav aria-label="主导航"><a href="#home">Home</a><a href="#work">Work</a><a href="#studio">Studio</a></nav><a class="contact-tab" href="#contact">联系我 <span aria-hidden="true">↗</span></a></header>
@@ -47,7 +69,7 @@
 <div class="slide-tools"><div class="count"><span id="counter">01</span><small> / 09</small></div><div id="dots" aria-label="选择影片"></div></div>
 <span class="scroll-cue" aria-hidden="true">SCROLL <i></i></span>
 </section>
-<section class="inside" id="works" hidden><div class="section-head"><h1>Selected films<span>.</span></h1><span>作品 / 09</span></div><div id="grid"></div></section>
+<section class="inside" id="works" hidden><div class="section-head"><h1>Selected films<span>.</span></h1><span>作品 / 09</span></div><div id="grid" role="group" aria-label="九支影片，左右浏览，选择封面放映"></div><div class="rail-foot"><span>横滑选片 · 点封面放映</span><input id="rail-scrub" type="range" min="0" max="1000" value="0" aria-label="浏览影片条"></div></section>
 <main class="inside" id="studio" hidden>
 <section class="hero" aria-labelledby="role">
 <span class="name-en" tabindex="0">JIANG LAN</span><p class="name">姜澜</p><h1 id="role">AI 漫剧制作师</h1>
@@ -197,12 +219,18 @@ function selectFilm(i){
   if(slot){slot.value=String(activeFilm);syncTitleInput()}
   paintHero();fillGrid();animateText($('#counter'));animateText($('.film-meta'));
 }
+let workRailOpened=false;
 function navigate(){
   const hash=location.hash;
   const section=['#studio','#experience','#skills','#contact','#edit','#storyboard','#look','#final-frame'].includes(hash)?'studio':['#work','#projection'].includes(hash)?'work':'home';
   landing.hidden=section!=='home';$('#works').hidden=section!=='work';$('#studio').hidden=section!=='studio';
   document.querySelectorAll('.mast nav a').forEach(a=>{if(a.hash==='#'+section)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
   window.scrollTo(0,0);
+  if(section==='work' && !workRailOpened){
+    workRailOpened=true;
+    if(matchMedia('(hover:hover) and (min-width:651px)').matches) grid.scrollLeft=grid.firstElementChild.offsetWidth*.45;
+    syncRail();
+  }
   if(!landing.hidden){paintHero();animateText($('.hero-caption'))}
   else{landing.querySelectorAll('video').forEach(v=>v.pause());animateText(section==='work'?$('.section-head'):$('.name-en'))}
   if(['#contact','#skills','#experience'].includes(hash))$(hash)?.scrollIntoView();
@@ -248,7 +276,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)landing.que
 
 
 
-const sweepLabels = '.mast a,.film-meta>span,#play-caption,.count,.scroll-cue,.section-head>*,.player-head button,.player-foot button,#play-error,#player-count,.edit-start,#edit-bar :is(strong,label,button,a,[role="status"])';
+const sweepLabels = '.rail-foot span,.mast a,.film-meta>span,#play-caption,.count,.scroll-cue,.section-head>*,.player-head button,.player-foot button,#play-error,#player-count,.edit-start,#edit-bar :is(strong,label,button,a,[role="status"])';
 const graphemes = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter(undefined,{granularity:'grapheme'}) : null;
 let sweepFrame, fallbackMotion;
 function stopCopySweep(){
@@ -353,6 +381,91 @@ window.addEventListener('scroll',clearStroke,{passive:true});
 window.addEventListener('resize',clearStroke);
 window.addEventListener('hashchange',clearStroke);
 document.querySelectorAll('.film-meta>span').forEach(label=>label.onclick=openPlayer);
+
+
+const workRail=$('#grid'), railScrub=$('#rail-scrub');
+let railFrame=0, railTarget=0, anchorX=null, anchorScroll=0, railDrag=null, ignoreClickUntil=0;
+const railLimit=()=>Math.max(0,workRail.scrollWidth-workRail.clientWidth);
+function stopRail(){
+  cancelAnimationFrame(railFrame);
+  railFrame=0;
+  railTarget=workRail.scrollLeft;
+}
+function easeRail(){
+  const distance=railTarget-workRail.scrollLeft;
+  if(reduce.matches || Math.abs(distance)<1.5){
+    workRail.scrollLeft=railTarget;
+    railFrame=0;
+    return;
+  }
+  workRail.scrollLeft+=distance*.17;
+  railFrame=requestAnimationFrame(easeRail);
+}
+function panRail(value){
+  railTarget=Math.max(0,Math.min(railLimit(),value));
+  if(!railFrame)railFrame=requestAnimationFrame(easeRail);
+}
+function resetAnchor(clientX){
+  const rect=workRail.getBoundingClientRect();
+  anchorX=Math.max(0,Math.min(rect.width,clientX-rect.left));
+  anchorScroll=workRail.scrollLeft;
+}
+workRail.addEventListener('pointerenter',e=>{
+  if(e.pointerType==='mouse')resetAnchor(e.clientX);
+});
+workRail.addEventListener('pointerdown',e=>{
+  stopRail();
+  if(e.pointerType==='mouse' && e.button===0)railDrag={id:e.pointerId,x:e.clientX,left:workRail.scrollLeft,moved:false};
+});
+workRail.addEventListener('pointermove',e=>{
+  if(e.pointerType!=='mouse'||player.open)return;
+  if(railDrag && railDrag.id===e.pointerId){
+    const dx=e.clientX-railDrag.x;
+    if(!railDrag.moved && Math.abs(dx)<5)return;
+    if(!railDrag.moved){railDrag.moved=true;workRail.setPointerCapture(e.pointerId)}
+    workRail.scrollLeft=railDrag.left+dx*Math.max(1,railLimit()/workRail.clientWidth);
+    return;
+  }
+  if(anchorX===null)resetAnchor(e.clientX);
+  const rect=workRail.getBoundingClientRect(), x=e.clientX-rect.left;
+  const target=x<anchorX ? anchorScroll*x/Math.max(1,anchorX)
+    : anchorScroll+(railLimit()-anchorScroll)*(x-anchorX)/Math.max(1,rect.width-anchorX);
+  panRail(target);
+});
+function releaseRail(e){
+  if(railDrag?.id!==e.pointerId)return;
+  if(railDrag.moved){ignoreClickUntil=performance.now()+350;if(workRail.hasPointerCapture(e.pointerId))workRail.releasePointerCapture(e.pointerId)}
+  railDrag=null;resetAnchor(e.clientX);
+}
+workRail.addEventListener('pointerup',releaseRail);
+workRail.addEventListener('pointercancel',releaseRail);
+workRail.addEventListener('lostpointercapture',e=>{if(railDrag?.id===e.pointerId)railDrag=null});
+workRail.addEventListener('pointerleave',()=>{if(!railDrag?.moved){railDrag=null;stopRail();anchorX=null}});
+workRail.addEventListener('dragstart',e=>e.preventDefault());
+workRail.addEventListener('click',e=>{if(performance.now()<ignoreClickUntil){e.stopImmediatePropagation();e.preventDefault()}else stopRail()},true);
+workRail.addEventListener('wheel',e=>{
+  if(e.ctrlKey||Math.abs(e.deltaX)>=Math.abs(e.deltaY))return;
+  const delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?workRail.clientWidth:1);
+  const current=railFrame?railTarget:workRail.scrollLeft;
+  if((delta<0 && current<=1)||(delta>0 && current>=railLimit()-1))return;
+  e.preventDefault();panRail(current+delta);anchorX=null;
+},{passive:false});
+workRail.addEventListener('keydown',e=>{
+  const buttons=[...workRail.children],i=buttons.indexOf(e.target);
+  if(i<0 || !['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
+  e.preventDefault();stopRail();anchorX=null;
+  const next=e.key==='Home'?0:e.key==='End'?buttons.length-1:Math.max(0,Math.min(buttons.length-1,i+(e.key==='ArrowRight'?1:-1)));
+  buttons[next].focus({preventScroll:true});buttons[next].scrollIntoView({block:'nearest',inline:'center',behavior:reduce.matches?'instant':'smooth'});
+});
+function syncRail(){
+  const limit=railLimit();if(!limit)return;
+  railScrub.value=Math.round(1000*workRail.scrollLeft/limit);
+  railScrub.setAttribute('aria-valuetext',Math.round(railScrub.value/10)+'%');
+}
+workRail.addEventListener('scroll',syncRail,{passive:true});
+railScrub.oninput=()=>{stopRail();workRail.scrollLeft=railLimit()*railScrub.value/1000;anchorX=null};
+window.addEventListener('resize',()=>{stopRail();anchorX=null;syncRail()});
+player.addEventListener('close',()=>{anchorX=null;stopRail()});
 
 
 navigate();selectFilm(0);
