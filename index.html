@@ -82,6 +82,8 @@ background:radial-gradient(circle,rgba(0,0,0,.94) 0 5%,rgba(0,0,0,.72) 9%,rgba(0
 @media(prefers-reduced-motion:reduce){.finger-dust{animation:none}}
 
 #landing .hero-caption h1,#landing .film-meta>span{cursor:default}
+
+#start-preview{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);color:white;background:#171717cc;border:1px solid #fff9;border-radius:30px;padding:10px 17px;font-size:14px}#start-preview[hidden]{display:none}.gravity-grain{z-index:1}.hero-caption,.slide-tools{z-index:2}
 </style></head><body>
 
 <header class="mast"><a class="monogram" href="#home" aria-label="Jiang Lan 首页"><b>J</b><span>IANG&nbsp;</span><b>L</b><span>AN</span></a><nav aria-label="主导航"><a href="#home">Home</a><a href="#work">Work</a><a href="#studio">Studio</a></nav><a class="contact-tab" href="#contact">联系我 <span aria-hidden="true">↗</span></a></header>
@@ -89,7 +91,7 @@ background:radial-gradient(circle,rgba(0,0,0,.94) 0 5%,rgba(0,0,0,.72) 9%,rgba(0
 <div class="backdrop" aria-hidden="true"><img src="films/noir/2.jpg" alt="" fetchpriority="high"></div>
 <div class="hero-caption"><h1 id="brand-title" aria-label="Jiang Lan Films">JIANG LAN FILMS</h1><div class="film-meta"><span>姜澜 · AI 漫剧</span><i></i><span id="shot-id">FILM 01</span></div></div>
 <div class="slide-tools"><div class="count"><span id="counter">01</span><small> / 09</small></div><div id="dots" aria-label="选择影片"></div></div>
-<button id="touch-demo" type="button">体验颗粒</button><span class="scroll-cue" aria-hidden="true">SCROLL <i></i></span>
+<button id="start-preview" type="button" hidden>播放黑白片段</button><button id="touch-demo" type="button">体验颗粒</button><span class="scroll-cue" aria-hidden="true">SCROLL <i></i></span>
 </section>
 <section class="inside" id="works" hidden><div class="section-head"><h1>Selected films<span>.</span></h1><span>作品 / 09</span></div><div id="grid" role="group" aria-label="九支影片，左右浏览，选择封面放映"></div><div class="rail-foot"><span>横滑选片 · 点封面放映</span><input id="rail-scrub" type="range" min="0" max="1000" value="0" aria-label="浏览影片条"></div></section>
 <main class="inside" id="studio" hidden>
@@ -213,28 +215,56 @@ for(const node of [$('#brand-title'),$('.name-en')]){
   node.onpointerenter=()=>letterSweep(node);node.onfocus=()=>letterSweep(node);
 }
 const focal=[27,20,28,25,26,29,27,24,24];
-let heroKey='', previousIndex=0;
-function releaseLayer(layer){if(!layer)return;const v=layer.querySelector('video');if(v){v.pause();v.removeAttribute('src');v.load()}layer.remove()}
+let heroKey='', previousIndex=0, previewRequested=false;
+const startPreview=$('#start-preview');
+startPreview.onclick=()=>{previewRequested=true;heroKey='';paintHero()};
+function releaseLayer(layer){
+  clearTimeout(layer.previewTimer);
+  const v=layer.querySelector('video');
+  if(v){v.onplaying=v.ontimeupdate=v.onerror=null;v.pause();v.removeAttribute('src');v.load()}
+  layer.remove();
+}
 function paintHero(){
   if(landing.hidden||player.open||document.hidden)return;
   const i=activeFilm,entry=filmLibrary[i],custom=fileURL(i),key=custom||entry.src;
-  if(heroKey===key){const v=Array.from(landing.querySelectorAll('.backdrop')).pop()?.querySelector('video');if(v&&!reduce.matches)v.play().catch(()=>{});return}
+  if(heroKey===key){Array.from(landing.querySelectorAll('.backdrop')).pop()?.resumePreview?.();return}
   heroKey=key;
   const previous=[...landing.querySelectorAll('.backdrop')];
-  previous.forEach(layer=>layer.querySelector('video')?.pause());
+  previous.forEach(layer=>{clearTimeout(layer.previewTimer);layer.querySelector('video')?.pause()});
   const layer=document.createElement('div');layer.className='backdrop incoming';layer.style.setProperty('--focal',focal[i]+'%');
   layer.style.setProperty('--cut',i>=previousIndex?'100% 0 0 0':'0 0 100% 0');previousIndex=i;
-  if(!custom){const img=new Image();img.alt='';img.src='films/noir/'+(entry.originalSlot+1)+'.jpg';layer.append(img)}
-  if(custom||(!reduce.matches&&!navigator.connection?.saveData)){
-    const clip=document.createElement('video');clip.playsInline=true;clip.muted=true;clip.loop=true;clip.preload='metadata';
-    if(!custom)clip.poster='films/noir/'+(entry.originalSlot+1)+'.jpg';
-    clip.onloadeddata=()=>{clip.classList.add('live');if(!reduce.matches&&!navigator.connection?.saveData&&layer.isConnected&&heroKey===key&&!player.open&&!landing.hidden)clip.play().catch(()=>{})};
-    clip.src=custom||('films/noir/'+(entry.originalSlot+1)+'.mp4');
-    layer.append(clip);
-  }
+  const base='films/noir/'+(entry.originalSlot+1);
+  let image;
+  if(!custom){image=new Image();image.alt='';image.src=base+'.jpg';layer.append(image)}
   $('.hero-caption').before(layer);
-  if(!reduce.matches&&!navigator.connection?.saveData)layer.querySelector('video')?.play().catch(()=>{});
   setTimeout(()=>previous.forEach(releaseLayer),reduce.matches?0:720);
+  startPreview.hidden=previewRequested||(!reduce.matches&&!navigator.connection?.saveData);
+  if(!startPreview.hidden)return;
+  const clip=document.createElement('video');
+  for(const attr of ['muted','playsinline','webkit-playsinline','autoplay','loop'])clip.setAttribute(attr,'');
+  clip.defaultMuted=clip.muted=clip.autoplay=clip.loop=clip.playsInline=true;
+  clip.preload='auto';if(!custom)clip.poster=base+'.jpg';
+  const current=()=>layer.isConnected&&heroKey===key&&!landing.hidden&&!document.hidden&&!player.open;
+  let fallback=false,attempting=false;
+  function showMotionImage(){
+    if(!current()||fallback)return;
+    clearTimeout(layer.previewTimer);
+    if(!image){startPreview.hidden=false;return}
+    fallback=true;clip.pause();clip.classList.remove('live');
+    image.onerror=()=>{image.onerror=null;image.src=base+'.jpg';if(current())startPreview.hidden=false};
+    image.src=base+'.webp';
+  }
+  function watch(){clearTimeout(layer.previewTimer);layer.previewTimer=setTimeout(showMotionImage,2200)}
+  clip.ontimeupdate=()=>{if(current()&&!fallback&&!clip.paused&&clip.currentTime>0){clip.classList.add('live');watch()}};
+  clip.onerror=showMotionImage;
+  layer.resumePreview=()=>{
+    if(!current()||fallback||attempting)return;
+    watch();
+    if(!clip.paused)return;
+    attempting=true;
+    Promise.resolve(clip.play()).catch(showMotionImage).finally(()=>{attempting=false});
+  };
+  layer.append(clip);clip.src=custom||base+'.mp4';layer.resumePreview();
 }
 function revealShot(){
   const label=$('#shot-id'),text='FILM '+count(activeFilm);
@@ -551,7 +581,7 @@ function installFilmTexture(){
   const tile=document.createElement('canvas');
   tile.width=tile.height=128;
   const tc=tile.getContext('2d');
-  if(!tc)return;
+  if(!tc){installFingerLens();return}
   const noise=tc.createImageData(128,128);
   for(let i=0;i<noise.data.length;i+=4){
     const v=Math.random()>.5?255:0;
@@ -565,7 +595,7 @@ function installFilmTexture(){
   lens.width=lens.height=sample.width=sample.height=size;
   lens.className='gravity-grain';lens.setAttribute('aria-hidden','true');landing.append(lens);
   const ctx=lens.getContext('2d'), source=sample.getContext('2d');
-  if(!ctx||!source)return;
+  if(!ctx||!source){installFingerLens();return}
   const dust=Array.from({length:170},()=>({angle:Math.random()*Math.PI*2,orbit:Math.random(),light:Math.random()}));
   const shade=ctx.createRadialGradient(c,c,2,c,c,c*.93);
   shade.addColorStop(0,'rgba(1,1,1,.94)');shade.addColorStop(.12,'rgba(2,2,2,.8)');shade.addColorStop(.42,'rgba(6,6,6,.22)');shade.addColorStop(1,'transparent');
@@ -609,9 +639,16 @@ function installFilmTexture(){
     if(!frame)frame=requestAnimationFrame(draw);
   }
   landing.addEventListener('pointermove',e=>{if(e.pointerType==='mouse')followPoint(e,false)});
-  function followTouch(){stop()}
+  function followTouch(e){if(e.touches.length===1&&!e.target.closest('button'))followPoint(e.touches[0],true);else stop()}
   landing.addEventListener('touchstart',followTouch,{passive:true});
   landing.addEventListener('touchmove',followTouch,{passive:true});
+  let demoTimer;
+  $('#touch-demo').onclick=()=>{
+    if(reduce.matches){if(!landing.querySelector('.finger-lens'))installFingerLens();$('#touch-demo').onclick();return}
+    const r=landing.getBoundingClientRect();
+    followPoint({clientX:r.left+r.width/2,clientY:r.top+r.height*.44},false);
+    clearTimeout(demoTimer);demoTimer=setTimeout(stop,1400);
+  };
   landing.addEventListener('touchend',stop,{passive:true});
   landing.addEventListener('touchcancel',stop,{passive:true});
   landing.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')stop()});
@@ -655,8 +692,6 @@ function installFingerLens(){
   };
   window.addEventListener('hashchange',hide);
 }
-installFingerLens();
-
 installFilmTexture();
 const touchLayout=matchMedia('(hover:none), (pointer:coarse)');
 function updateCue(){document.querySelector('.scroll-cue').firstChild.textContent=touchLayout.matches?(reduce.matches?'滑动切片':'按住探索 · 滑动切片'):'SCROLL '}
