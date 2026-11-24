@@ -65,6 +65,8 @@
 #landing .backdrop{filter:grayscale(1)}#landing:before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:var(--silver-grain);opacity:.65}.gravity-grain{position:absolute;top:0;left:0;z-index:-1;width:240px;height:240px;pointer-events:none;opacity:0;transition:opacity .19s;filter:grayscale(1);mask-image:radial-gradient(circle,#000 44%,transparent 70%)}.gravity-grain.visible{opacity:1}@media(prefers-reduced-motion:reduce){.gravity-grain{display:none}}
 
 @media(pointer:coarse){#landing{touch-action:pan-y pinch-zoom;-webkit-touch-callout:none}#landing .scroll-cue{letter-spacing:.06em;pointer-events:none}}.touch-lit::after{transform:scaleX(1)!important}
+
+@media(pointer:coarse){#grid{-webkit-touch-callout:none}.monogram.touch-lit span{max-width:3.5em}.monogram.touch-lit{background:#171717;z-index:1}}
 </style></head><body>
 
 <header class="mast"><a class="monogram" href="#home" aria-label="Jiang Lan 首页"><b>J</b><span>IANG&nbsp;</span><b>L</b><span>AN</span></a><nav aria-label="主导航"><a href="#home">Home</a><a href="#work">Work</a><a href="#studio">Studio</a></nav><a class="contact-tab" href="#contact">联系我 <span aria-hidden="true">↗</span></a></header>
@@ -246,7 +248,7 @@ function navigate(){
   window.scrollTo(0,0);
   if(section==='work' && !workRailOpened){
     workRailOpened=true;
-    if(matchMedia('(hover:hover) and (min-width:651px)').matches) grid.scrollLeft=grid.firstElementChild.offsetWidth*.45;
+    grid.scrollLeft=grid.firstElementChild.offsetWidth*(matchMedia('(pointer:coarse)').matches?.24:.45);
     syncRail();
   }
   if(!landing.hidden){paintHero();animateText($('.hero-caption'))}
@@ -273,7 +275,8 @@ landing.addEventListener('touchend',e=>{
     if(!quickTap || player.open)suppressClickUntil=performance.now()+420;
     return;
   }
-  suppressClickUntil=performance.now()+420;selectFilm(activeFilm+Math.sign(distance));
+  suppressClickUntil=performance.now()+420;
+  if(performance.now()-touchBegan<400)selectFilm(activeFilm+Math.sign(distance));
 },{passive:true});
 landing.addEventListener('touchcancel',()=>{start=undefined});
 landing.addEventListener('click',e=>{if(performance.now()<suppressClickUntil){e.preventDefault();e.stopImmediatePropagation()}},true);
@@ -401,18 +404,35 @@ function highlightCopyLine(event){
 }
 studioCopy.addEventListener('pointermove',e=>{if(e.pointerType!=='touch')highlightCopyLine(e)});
 let touchStrokeTimer;
-document.addEventListener('pointerdown',e=>{
-  if(e.pointerType!=='touch'||!e.isPrimary)return;
-  clearTimeout(touchStrokeTimer);clearStroke();
-  if(e.target.isContentEditable)return;
-  if(studioCopy.contains(e.target))highlightCopyLine(e);
-  const label=e.target.closest(sweepLabels+',#brand-title,.name-en');
+let lastTouchLabel=null;
+function trackTouchText(target,x,y){
+  clearTimeout(touchStrokeTimer);
+  if(!target||target.isContentEditable){clearStroke();return}
+  if(studioCopy.contains(target))highlightCopyLine({target,clientX:x,clientY:y,pointerType:'touch'});
+  else clearStroke();
+  const label=target.closest(sweepLabels+',#brand-title,.name-en');
+  if(label===lastTouchLabel)return;
+  lastTouchLabel?.classList.remove('touch-lit');
+  lastTouchLabel=label;
   if(label){
-    if(!label.matches('#brand-title,.name-en'))sweepCopy(label);
-    label.classList.add('touch-lit');setTimeout(()=>label.classList.remove('touch-lit'),650);
+    if(label.matches('#brand-title,.name-en'))letterSweep(label);else sweepCopy(label);
+    label.classList.add('touch-lit');
   }
-  touchStrokeTimer=setTimeout(clearStroke,650);
-});
+}
+document.addEventListener('touchstart',e=>{
+  if(e.touches.length!==1)return;
+  lastTouchLabel?.classList.remove('touch-lit');lastTouchLabel=null;clearStroke();
+  const p=e.touches[0];trackTouchText(e.target,p.clientX,p.clientY);
+},{passive:true});
+document.addEventListener('touchmove',e=>{
+  if(e.touches.length!==1)return;
+  const p=e.touches[0];trackTouchText(document.elementFromPoint(p.clientX,p.clientY),p.clientX,p.clientY);
+},{passive:true});
+function endTextTouch(){
+  touchStrokeTimer=setTimeout(()=>{lastTouchLabel?.classList.remove('touch-lit');lastTouchLabel=null;clearStroke()},600);
+}
+document.addEventListener('touchend',endTextTouch,{passive:true});
+document.addEventListener('touchcancel',endTextTouch,{passive:true});
 studioCopy.addEventListener('pointerleave',e=>{if(e.pointerType!=='touch')clearStroke()});
 window.addEventListener('scroll',clearStroke,{passive:true});
 window.addEventListener('resize',clearStroke);
@@ -478,6 +498,22 @@ workRail.addEventListener('pointerup',releaseRail);
 workRail.addEventListener('pointercancel',releaseRail);
 workRail.addEventListener('lostpointercapture',e=>{if(railDrag?.id===e.pointerId)railDrag=null});
 workRail.addEventListener('pointerleave',()=>{if(!railDrag?.moved){railDrag=null;stopRail();anchorX=null}});
+let railFinger=null;
+workRail.addEventListener('touchstart',e=>{
+  if(e.touches.length!==1){railFinger=null;return}
+  const p=e.touches[0];railFinger={x:p.clientX,y:p.clientY,left:workRail.scrollLeft,at:performance.now(),reverse:false};
+},{passive:true});
+workRail.addEventListener('touchmove',e=>{
+  if(!railFinger||e.touches.length!==1)return;
+  const p=e.touches[0],dx=p.clientX-railFinger.x,dy=p.clientY-railFinger.y;
+  if(Math.abs(dx)+Math.abs(dy)<5)return;
+  if(!e.cancelable||(!railFinger.reverse&&(performance.now()-railFinger.at<320||Math.abs(dx)<Math.abs(dy)))){railFinger=null;return}
+  e.preventDefault();railFinger.reverse=true;
+  workRail.scrollLeft=railFinger.left+dx*Math.max(1,railLimit()/workRail.clientWidth);
+},{passive:false});
+function releaseRailFinger(){if(railFinger?.reverse)ignoreClickUntil=performance.now()+400;railFinger=null}
+workRail.addEventListener('touchend',releaseRailFinger);
+workRail.addEventListener('touchcancel',releaseRailFinger);
 workRail.addEventListener('dragstart',e=>e.preventDefault());
 workRail.addEventListener('click',e=>{if(performance.now()<ignoreClickUntil){e.stopImmediatePropagation();e.preventDefault()}else stopRail()},true);
 workRail.addEventListener('wheel',e=>{
