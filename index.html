@@ -8,7 +8,7 @@
 #player{margin:0;width:100%;height:100dvh;max-height:none;max-width:none;border:0;padding:0;background:#090909;color:white}#player[open]{display:grid;grid-template-rows:auto minmax(0,1fr) auto}#player video{display:block;width:100%;height:100%;object-fit:contain}.player-head,.player-foot{display:flex;justify-content:space-between;align-items:center;padding:10px max(16px,4vw);gap:8px;font-size:13px}.player-head button,.player-foot button{padding:8px}.player-head span{font-variant-numeric:tabular-nums;color:#d0cfca}#edit-bar{position:relative;z-index:6;background:#e8e6de;color:#151515;display:flex;align-items:center;flex-wrap:wrap;gap:9px;padding:12px 4vw;font-size:14px}#edit-bar button,#edit-bar input,#edit-bar select,.edit-start{padding:5px 9px;border:1px solid #777;background:white;color:#161616;border-radius:4px}.editing .mast{position:sticky;top:6px}.editing #landing{height:80svh}.editing [contenteditable]{outline:1px dashed #b6b29e;outline-offset:2px}.edit-start{margin-top:22px}
 @media(max-width:650px){.mast{inset:12px 12px auto;height:49px;padding:0 12px}.mast nav{gap:14px}.mast nav a{font-size:12px}.contact-tab{font-size:11px;padding:5px 7px}.monogram{font-size:22px}.monogram:is(:hover,:focus-visible) span{max-width:0}.hero-caption{left:20px;right:15px;max-width:none;bottom:128px}.hero-caption h1{font-size:clamp(39px,10.4vw,66px);margin-bottom:13px}.film-meta{gap:9px}.slide-tools{right:20px;bottom:max(22px,env(safe-area-inset-bottom))}.scroll-cue{top:79px;right:18px}.count{font-size:25px}#dots button{padding:10px 5px}#grid{grid-template-columns:repeat(2,1fr)}.section{grid-template-columns:1fr}.section-head{margin-bottom:20px}.section{padding:24px 0;gap:10px}.inside{width:calc(100% - 36px)}.hero-caption h1 span{white-space:pre}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
-.nav-mask{display:block;overflow:hidden;height:1.45em;line-height:1.45}.nav-mask>span{display:block;position:relative;transition:transform .38s cubic-bezier(.2,.75,.2,1)}.nav-mask>span:after{content:attr(data-echo);position:absolute;top:100%;left:0}.mast nav a:is(:hover,:focus-visible) .nav-mask>span{transform:translateY(-100%)}#shot-id{display:inline-block;overflow:hidden;line-height:1.25}.hero-caption h1{white-space:nowrap}.hero-caption h1{letter-spacing:-.06em}
+#shot-id{display:inline-block;overflow:hidden;line-height:1.25}.hero-caption h1{white-space:nowrap}.hero-caption h1{letter-spacing:-.06em}
 
 /* A single stroke follows the hovered label or line of copy. */
 :is(.mast a,#brand-title,.name-en,.film-meta>span,.film-meta button,.count,.section-head>*,.player-head button,.player-foot button,#player-count){position:relative}
@@ -32,6 +32,11 @@
 :is(.mast a,#brand-title,.name-en,.film-meta button,.player-head button,.player-foot button):focus-visible::after{transform:scaleX(1)}
 .copy-underline{position:fixed;z-index:3;height:1px;background:white;pointer-events:none;transform-origin:left}
 @media(prefers-reduced-motion:reduce){.copy-underline{animation:none}}
+
+::highlight(film-dim){color:rgba(160,160,160,.44)}
+::highlight(film-soft){color:#aaa}
+::highlight(film-light){color:#fff}
+#edit-bar ::highlight(film-light),.edit-start::highlight(film-light){color:#151515}
 </style></head><body>
 
 <header class="mast"><a class="monogram" href="#home" aria-label="Jiang Lan 首页"><b>J</b><span>IANG&nbsp;</span><b>L</b><span>AN</span></a><nav aria-label="主导航"><a href="#home">Home</a><a href="#work">Work</a><a href="#studio">Studio</a></nav><a class="contact-tab" href="#contact">联系我 <span aria-hidden="true">↗</span></a></header>
@@ -184,11 +189,6 @@ function revealShot(){
     return span;
   }));
 }
-for(const link of document.querySelectorAll('.mast nav a')){
-  const name=link.textContent;
-  const mask=document.createElement('span'),inner=document.createElement('span');
-  mask.className='nav-mask';inner.textContent=name;inner.dataset.echo=name;mask.append(inner);link.replaceChildren(mask);
-}
 function selectFilm(i){
   activeFilm=(i+filmLibrary.length)%filmLibrary.length;
   $('#counter').textContent=count(activeFilm);revealShot();
@@ -247,6 +247,77 @@ window.addEventListener('keydown',e=>{if(e.altKey||e.ctrlKey||e.metaKey||e.targe
 document.addEventListener('visibilitychange',()=>{if(document.hidden)landing.querySelectorAll('video').forEach(v=>v.pause());else paintHero()});
 
 
+
+const sweepLabels = '.mast a,.film-meta>span,#play-caption,.count,.scroll-cue,.section-head>*,.player-head button,.player-foot button,#play-error,#player-count,.edit-start,#edit-bar :is(strong,label,button,a,[role="status"])';
+const graphemes = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter(undefined,{granularity:'grapheme'}) : null;
+let sweepFrame, fallbackMotion;
+function stopCopySweep(){
+  cancelAnimationFrame(sweepFrame);
+  fallbackMotion?.cancel();
+  if (window.CSS?.highlights) {
+    CSS.highlights.delete('film-dim');
+    CSS.highlights.delete('film-soft');
+    CSS.highlights.delete('film-light');
+  }
+}
+function sweepCopy(field, row){
+  stopCopySweep();
+  if(reduce.matches || !field.textContent.trim()) return;
+  if (!window.CSS?.highlights || typeof Highlight!=='function') {
+    fallbackMotion=field.animate([{maskPosition:'100% 0'},{maskPosition:'0% 0'}],
+      {duration:580,easing:'linear'});
+    const mask='linear-gradient(90deg,#000 30%,#0005 48%,#000 60%)';
+    fallbackMotion.effect.setKeyframes([
+      {maskImage:mask,maskSize:'300% 100%',maskPosition:'100% 0'},
+      {maskImage:mask,maskSize:'300% 100%',maskPosition:'0% 0'}
+    ]);
+    return;
+  }
+  const letters=[];
+  const walker=document.createTreeWalker(field,NodeFilter.SHOW_TEXT);
+  for(let text=walker.nextNode();text;text=walker.nextNode()){
+    let offset=0;
+    for(const part of graphemes?graphemes.segment(text.data):text.data){
+      const char=part.segment??part;
+      const start=offset;offset+=char.length;
+      if(!char.trim()) continue;
+      const range=document.createRange();
+      range.setStart(text,start);range.setEnd(text,offset);
+      if(row){
+        const rect=range.getBoundingClientRect(), center=rect.top+rect.height/2;
+        if(center<row.top || center>row.bottom)continue;
+      }
+      letters.push(range);
+    }
+  }
+  if(!letters.length)return;
+  const delay=Math.min(21,470/letters.length), started=performance.now();
+  const levels=['film-dim','film-soft','film-light'];
+  function frame(now){
+    const bands=[[],[],[]];
+    const elapsed=now-started;
+    letters.forEach((range,index)=>{
+      const age=elapsed-index*delay;
+      if(age>=0 && age<180)bands[age<65?0:age<110?1:2].push(range);
+    });
+    levels.forEach((name,i)=>{if(bands[i].length)CSS.highlights.set(name,new Highlight(...bands[i]));else CSS.highlights.delete(name)});
+    if(elapsed<(letters.length-1)*delay+180)sweepFrame=requestAnimationFrame(frame);
+  }
+  frame(started);
+}
+document.addEventListener('pointerover',event=>{
+  if(event.pointerType==='touch') return;
+  const label=event.target.closest(sweepLabels);
+  if(label && !label.contains(event.relatedTarget))sweepCopy(label);
+});
+document.addEventListener('focusin',event=>{
+  if(event.target.matches(sweepLabels) && event.target.matches(':focus-visible'))sweepCopy(event.target);
+});
+document.addEventListener('pointerdown',event=>{
+  if(event.target.isContentEditable){stopCopySweep();clearStroke()}
+});
+window.addEventListener('hashchange',stopCopySweep);
+
 const studioCopy = $('#studio');
 const lineStroke = document.createElement('span');
 lineStroke.className = 'copy-underline';
@@ -260,7 +331,7 @@ function clearStroke(){
 }
 studioCopy.addEventListener('pointermove', event => {
   const field = event.target.closest('p,li,h1,h2,h3');
-  if (!field || event.pointerType==='touch' || field.isContentEditable) { clearStroke(); return; }
+  if (!field || event.pointerType==='touch' || (field.isContentEditable && field===document.activeElement)) { clearStroke(); return; }
   const range = document.createRange();
   range.selectNodeContents(field);
   const rows = Array.from(range.getClientRects());
@@ -271,6 +342,7 @@ studioCopy.addEventListener('pointermove', event => {
   Object.assign(lineStroke.style,{left:box.left+'px', top:box.bottom+'px', width:box.width+'px'});
   if (hoveredField===field && hoveredRow===index) return;
   hoveredField=field; hoveredRow=index;
+  sweepCopy(field,box);
   lineStroke.hidden=false;
   lineStroke.getAnimations().forEach(animation=>animation.cancel());
   if (!reduce.matches) lineStroke.animate([{transform:'scaleX(0)'},{transform:'scaleX(1)'}],
