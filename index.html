@@ -296,7 +296,12 @@ function navigate(){
     syncRail();
   }
   if(!landing.hidden){paintHero();animateText($('.hero-caption'))}
-  else{landing.querySelectorAll('video').forEach(v=>v.pause());animateText(section==='work'?$('.section-head'):$('.name-en'))}
+  else{
+    for(const layer of landing.querySelectorAll('.backdrop')){
+      if(layer.querySelector('video')){releaseLayer(layer);heroKey=''}
+    }
+    animateText(section==='work'?$('.section-head'):$('.name-en'));
+  }
   if(['#contact','#skills','#experience'].includes(hash))$(hash)?.scrollIntoView();
 }
 window.addEventListener('hashchange',navigate);
@@ -325,8 +330,17 @@ landing.addEventListener('touchcancel',()=>{start=undefined});
 landing.addEventListener('click',e=>{if(performance.now()<suppressClickUntil){e.preventDefault();e.stopImmediatePropagation()}},true);
 let returnFocus;
 function playFilm(){
-  const i=activeFilm,custom=fileURL(i);
-  movie.poster=custom?'':filmLibrary[i].poster;movie.src=custom||filmLibrary[i].src;
+  const i=activeFilm,custom=fileURL(i),entry=filmLibrary[i];
+  const mobile=!custom && (matchMedia('(pointer:coarse), (max-width:700px)').matches || navigator.connection?.saveData);
+  movie.poster=custom?'':entry.poster;
+  movie.onerror=()=>{
+    if(!player.open || activeFilm!==i || !movie.error)return;
+    if(mobile && movie.getAttribute('src')!==entry.src){
+      movie.src=entry.src;
+      movie.play().catch(()=>{});
+    }else $('#play-error').textContent='加载失败，请重新打开影片。';
+  };
+  movie.src=custom || (mobile ? 'films/mobile/'+(entry.originalSlot+1)+'.mp4' : entry.src);
   $('#player-count').textContent=count(i)+' / '+count(filmLibrary.length-1);$('#play-error').textContent='';
   movie.play().catch(()=>{});
 }
@@ -334,7 +348,7 @@ function openPlayer(){if(player.open)return;returnFocus=document.activeElement;l
 $('#leave').onclick=()=>player.close();
 $('#full').onclick=()=>{if(document.fullscreenElement)document.exitFullscreen();else if(player.requestFullscreen)player.requestFullscreen().catch(()=>{});else movie.webkitEnterFullscreen?.()};
 function step(delta){selectFilm(activeFilm+delta);if(player.open)playFilm()}
-$('#previous').onclick=()=>step(-1);$('#next').onclick=()=>step(1);movie.onerror=()=>{$('#play-error').textContent='加载失败，请重新打开影片。'};
+$('#previous').onclick=()=>step(-1);$('#next').onclick=()=>step(1);
 player.onclose=()=>{movie.pause();movie.removeAttribute('src');movie.load();returnFocus?.focus({preventScroll:true});paintHero()};
 window.addEventListener('keydown',e=>{if(e.altKey||e.ctrlKey||e.metaKey||e.target.closest('input,select,textarea,[contenteditable],video')||(!player.open&&landing.hidden))return;
   if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();step(e.key==='ArrowRight'?1:-1)}
@@ -462,7 +476,7 @@ document.addEventListener('touchstart',e=>{
   const p=e.touches[0];trackTouchText(e.target,p.clientX,p.clientY);
 },{passive:true});
 document.addEventListener('touchmove',e=>{
-  if(e.touches.length!==1)return;
+  if(e.touches.length!==1 || player.open || grid.contains(e.target))return;
   const p=e.touches[0];trackTouchText(document.elementFromPoint(p.clientX,p.clientY),p.clientX,p.clientY);
 },{passive:true});
 function endTextTouch(){
@@ -534,20 +548,30 @@ workRail.addEventListener('pointerup',releaseRail);
 workRail.addEventListener('pointercancel',releaseRail);
 workRail.addEventListener('lostpointercapture',e=>{if(railDrag?.id===e.pointerId)railDrag=null});
 workRail.addEventListener('pointerleave',()=>{if(!railDrag?.moved){railDrag=null;stopRail();anchorX=null}});
-let railFinger=null;
-workRail.addEventListener('touchstart',e=>{
-  if(e.touches.length!==1){railFinger=null;return}
-  const p=e.touches[0];railFinger={x:p.clientX,y:p.clientY,left:workRail.scrollLeft,at:performance.now(),reverse:false};
-},{passive:true});
-workRail.addEventListener('touchmove',e=>{
-  if(!railFinger||e.touches.length!==1)return;
-  const p=e.touches[0],dx=p.clientX-railFinger.x,dy=p.clientY-railFinger.y;
-  if(Math.abs(dx)+Math.abs(dy)<5)return;
-  if(!e.cancelable||(!railFinger.reverse&&(performance.now()-railFinger.at<320||Math.abs(dx)<Math.abs(dy)))){railFinger=null;return}
+let railFinger=null, reverseTimer;
+function reverseDrag(e){
+  if(!railFinger || e.touches.length!==1 || !e.cancelable)return;
+  const p=e.touches[0],dx=p.clientX-railFinger.x;
+  if(!railFinger.reverse && Math.abs(dx)<Math.max(5,Math.abs(p.clientY-railFinger.y)))return;
   e.preventDefault();railFinger.reverse=true;
   workRail.scrollLeft=railFinger.left+dx*Math.max(1,railLimit()/workRail.clientWidth);
-},{passive:false});
-function releaseRailFinger(){if(railFinger?.reverse)ignoreClickUntil=performance.now()+400;railFinger=null}
+}
+workRail.addEventListener('touchstart',e=>{
+  releaseRailFinger();
+  if(e.touches.length!==1)return;
+  const p=e.touches[0];railFinger={x:p.clientX,y:p.clientY,left:workRail.scrollLeft,reverse:false};
+  reverseTimer=setTimeout(()=>workRail.addEventListener('touchmove',reverseDrag,{passive:false}),320);
+},{passive:true});
+workRail.addEventListener('touchmove',e=>{
+  if(!railFinger || !e.touches.length)return;
+  if(Math.hypot(e.touches[0].clientX-railFinger.x,e.touches[0].clientY-railFinger.y)>5)clearTimeout(reverseTimer);
+},{passive:true});
+function releaseRailFinger(){
+  clearTimeout(reverseTimer);
+  workRail.removeEventListener('touchmove',reverseDrag);
+  if(railFinger?.reverse)ignoreClickUntil=performance.now()+400;
+  railFinger=null;
+}
 workRail.addEventListener('touchend',releaseRailFinger);
 workRail.addEventListener('touchcancel',releaseRailFinger);
 workRail.addEventListener('dragstart',e=>e.preventDefault());
