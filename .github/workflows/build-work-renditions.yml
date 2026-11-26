@@ -1,0 +1,29 @@
+name: Build Work mobile films
+on:
+  push:
+    branches: [build/work-mobile-renditions]
+    paths: [.github/workflows/build-work-renditions.yml]
+permissions:
+  contents: write
+jobs:
+  encode:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install encoder
+        run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - name: Encode nine full-length films
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p films/mobile
+          for n in {1..9}; do
+            input="films/film-$n.mp4"
+            if [[ "$n" == 1 ]]; then input=showreel.mp4; fi
+            ffmpeg -v error -nostdin -i "$input" -map 0:v:0 -map '0:a:0?' -vf "scale='if(gte(iw,ih),min(iw,768),min(iw,432))':-2" -c:v libx264 -preset veryfast -crf 25 -maxrate 580k -bufsize 850k -pix_fmt yuv420p -force_key_frames 'expr:gte(t,n_forced*2)' -c:a aac -b:a 56k -movflags +faststart "films/mobile/$n.mp4"
+          done
+          git config user.name github-actions
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add films/mobile
+          git commit -m 'Add nine mobile renditions'
+          git push
